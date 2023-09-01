@@ -45,7 +45,7 @@ const Navigation = () => {
           <KeyIcon className="h-6 w-6" />
           Admin Panel
         </NavButton>
-        <NavButton variant="link" isNavOpen={isNavOpen} href="/test">
+        <NavButton variant="link" isNavOpen={isNavOpen} href="/admin">
           <KeyIcon className="h-6 w-6" />
           Admin Panel
         </NavButton>
