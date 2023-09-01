@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-
 import "@/styles/globals.css";
-
 import { headers } from "next/headers";
-
 import { TRPCReactProvider } from "./providers";
 
 const fontSans = Inter({
@@ -21,7 +18,11 @@ export default function RootLayout(props: { children: React.ReactNode }) {
     <html lang="en">
       <body className={["font-sans", fontSans.variable].join(" ")}>
         <TRPCReactProvider headers={headers()}>
-          {props.children}
+          <div className="flex h-screen">
+            <nav className="h-full w-64 bg-red-500"></nav>
+
+            {props.children}
+          </div>
         </TRPCReactProvider>
       </body>
     </html>
