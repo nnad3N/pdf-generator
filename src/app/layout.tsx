@@ -3,10 +3,7 @@ import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { headers } from "next/headers";
 import { TRPCReactProvider, ThemeProvider } from "./providers";
-import dynamic from "next/dynamic";
-const Navigation = dynamic(() => import("@/components/Navigation"), {
-  ssr: false,
-});
+import Navigation from "@/components/Navigation";
 
 const fontSans = Inter({
   subsets: ["latin"],

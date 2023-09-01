@@ -12,19 +12,25 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, Children } from "react";
+import { useState, Children, useEffect } from "react";
 
 const Navigation = () => {
-  const [isNavOpen, setIsNavOpen] = useState(() => {
+  const [isMounted, setIsMounted] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(true);
+
+  useEffect(() => {
+    setIsMounted(true);
     const isNavOpen = localStorage.getItem("isNavOpen");
 
     if (isNavOpen === null) {
       localStorage.setItem("isNavOpen", "true");
-      return true;
+      return;
     }
 
-    return JSON.parse(isNavOpen) as boolean;
-  });
+    setIsNavOpen(JSON.parse(isNavOpen) as boolean);
+  }, []);
+
+  if (!isMounted) return null;
 
   const handleToggleNav = () => {
     setIsNavOpen((isNavOpen) => !isNavOpen);
