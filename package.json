@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@prisma/client": "^5.2.0",
     "@t3-oss/env-nextjs": "^0.6.1",
@@ -21,6 +22,7 @@
     "@trpc/react-query": "^10.38.1",
     "@trpc/server": "^10.38.1",
     "next": "^13.4.19",
+    "next-themes": "^0.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "superjson": "^1.13.1",
