@@ -12,7 +12,7 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, Children, useEffect } from "react";
+import React, { useState, Children, useEffect } from "react";
 
 const Navigation = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -41,7 +41,7 @@ const Navigation = () => {
     <nav
       className={`flex h-full justify-between gap-y-3 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3 ${
         isNavOpen ? "w-64" : "w-max"
-      } flex-col bg-base-300 p-5`}
+      } flex-col bg-base-200 p-5`}
     >
       <div>
         <button onClick={handleToggleNav} className="btn btn-square btn-ghost">
@@ -138,13 +138,43 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
   }
 };
 
-const themeControlIcons = {
-  light: <SunIcon className="h-6 w-6" />,
-  dark: <MoonIcon className="h-6 w-6" />,
-  system: <ComputerDesktopIcon className="h-6 w-6" />,
+type ThemeOptions = "light" | "dark" | "system";
+
+interface GetThemeIcon {
+  theme: ThemeOptions;
+  size?: "small" | "base";
+}
+
+const getThemeIcon = ({ theme, size = "small" }: GetThemeIcon) => {
+  const className = size === "small" ? "h-4 w-4" : "h-6 w-6";
+
+  switch (theme) {
+    case "light":
+      return <SunIcon className={className} />;
+    case "dark":
+      return <MoonIcon className={className} />;
+    case "system":
+      return <ComputerDesktopIcon className={className} />;
+  }
 };
 
-type ThemeOptions = keyof typeof themeControlIcons;
+const themeControlButtons: {
+  theme: ThemeOptions;
+  icon: React.ReactNode;
+}[] = [
+  {
+    theme: "light",
+    icon: getThemeIcon({ theme: "light" }),
+  },
+  {
+    theme: "dark",
+    icon: getThemeIcon({ theme: "light" }),
+  },
+  {
+    theme: "system",
+    icon: getThemeIcon({ theme: "light" }),
+  },
+];
 
 interface ThemeControlProps {
   isNavOpen: boolean;
@@ -156,36 +186,20 @@ const ThemeControl: React.FC<ThemeControlProps> = ({ isNavOpen }) => {
   return (
     <Menu className="relative" as="div">
       <NavButton variant="menu-button" isNavOpen={isNavOpen}>
-        {themeControlIcons[theme as ThemeOptions]} Theme
+        {getThemeIcon({ theme: theme as ThemeOptions, size: "base" })} Theme
       </NavButton>
       <Menu.Items className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-100 p-2 shadow">
-        <Menu.Item>
-          <button
-            disabled={theme === "light"}
-            className="btn btn-ghost btn-sm justify-start"
-            onClick={() => setTheme("light")}
-          >
-            <SunIcon className="h-4 w-4" /> Light
-          </button>
-        </Menu.Item>
-        <Menu.Item>
-          <button
-            disabled={theme === "dark"}
-            className="btn btn-ghost btn-sm justify-start"
-            onClick={() => setTheme("dark")}
-          >
-            <MoonIcon className="h-4 w-4" /> Dark
-          </button>
-        </Menu.Item>
-        <Menu.Item>
-          <button
-            disabled={theme === "system"}
-            className="btn btn-ghost btn-sm justify-start"
-            onClick={() => setTheme("system")}
-          >
-            <ComputerDesktopIcon className="h-4 w-4" /> System
-          </button>
-        </Menu.Item>
+        {themeControlButtons.map((control) => (
+          <Menu.Item key={control.theme}>
+            <button
+              disabled={theme === control.theme}
+              className="ui-active:bg-base-content ui-active:bg-opacity-20 btn btn-ghost btn-sm justify-start"
+              onClick={() => setTheme(control.theme)}
+            >
+              {control.icon} {control.theme}
+            </button>
+          </Menu.Item>
+        ))}
       </Menu.Items>
     </Menu>
   );

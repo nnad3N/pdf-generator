@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.deactivated td:not(:last-child) {
+  @apply pointer-events-none select-none opacity-50;
+}
