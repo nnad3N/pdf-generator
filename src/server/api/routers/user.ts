@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { hash } from "bcrypt";
-import { revalidatePath } from "next/cache";
 import { userSchema } from "@/utils/schemas";
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
   getAll: publicProcedure.query(({ ctx }) => {
@@ -20,35 +20,87 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
-  add: publicProcedure.mutation(async ({ ctx }) => {
-    await ctx.prisma.user.create({
-      data: {
-        email: "test@test.com",
-        firstName: "New acc",
-        lastName: "Account",
-        password: await hash("test", 12),
-        isAdmin: false,
-      },
-    });
-    revalidatePath("/");
-    return;
-  }),
-  upsert: publicProcedure.input(userSchema).mutation(async ({ input, ctx }) => {
-    const hashedPassword = await hash(input.password, 12);
-    return ctx.prisma.user.upsert({
-      where: {
-        email: input.email,
-      },
-      create: {
-        ...input,
-        password: hashedPassword,
-      },
-      update: {
-        firstName: input.firstName,
-        lastName: input.lastName,
-        email: input.lastName,
-        isAdmin: input.isAdmin,
-      },
-    });
-  }),
+  upsert: publicProcedure
+    .input(
+      z
+        .object({
+          userId: z.string().uuid().optional(),
+        })
+        .merge(userSchema),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const hashedPassword = await hash(input.password, 12);
+      const { userId, ...user } = input;
+
+      return ctx.prisma.user.upsert({
+        where: {
+          id: userId,
+        },
+        create: {
+          ...user,
+          password: hashedPassword,
+        },
+        update: {
+          firstName: input.firstName,
+          lastName: input.lastName,
+          email: input.email,
+          isAdmin: input.isAdmin,
+        },
+      });
+    }),
+  toggleActive: publicProcedure
+    .input(z.object({ userId: z.string().uuid(), isDeactivated: z.boolean() }))
+    .mutation(({ input, ctx }) => {
+      // if (input.userId === ctx.session.user.id) {
+      //   throw new TRPCError({
+      //     message:
+      //       "You can't activate/deactivate the same account as the one you are currently using.",
+      //     code: "BAD_REQUEST",
+      //   });
+      // }
+
+      return ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          isDeactivated: input.isDeactivated,
+        },
+      });
+    }),
+  updatePassword: publicProcedure
+    .input(
+      z.object({
+        userId: z.string().uuid(),
+        password: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const hashedPassword = await hash(input.password, 12);
+      return ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+    }),
+  delete: publicProcedure
+    .input(z.object({ userId: z.string().uuid() }))
+    .mutation(({ input, ctx }) => {
+      // if (input.userId === ctx.session.user.id) {
+      //   throw new TRPCError({
+      //     message:
+      //       "You can't delete the same account as the one you are currently using.",
+      //     code: "BAD_REQUEST",
+      //   });
+      // }
+
+      return ctx.prisma.user.delete({
+        where: {
+          id: input.userId,
+        },
+      });
+    }),
 });

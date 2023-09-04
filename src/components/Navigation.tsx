@@ -168,11 +168,11 @@ const themeControlButtons: {
   },
   {
     theme: "dark",
-    icon: getThemeIcon({ theme: "light" }),
+    icon: getThemeIcon({ theme: "dark" }),
   },
   {
     theme: "system",
-    icon: getThemeIcon({ theme: "light" }),
+    icon: getThemeIcon({ theme: "system" }),
   },
 ];
 
@@ -188,12 +188,18 @@ const ThemeControl: React.FC<ThemeControlProps> = ({ isNavOpen }) => {
       <NavButton variant="menu-button" isNavOpen={isNavOpen}>
         {getThemeIcon({ theme: theme as ThemeOptions, size: "base" })} Theme
       </NavButton>
-      <Menu.Items className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-100 p-2 shadow">
+      <Menu.Items
+        as="ul"
+        className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-300 p-2 shadow-md"
+      >
         {themeControlButtons.map((control) => (
-          <Menu.Item key={control.theme}>
+          <Menu.Item
+            disabled={theme === control.theme}
+            as="li"
+            key={control.theme}
+          >
             <button
-              disabled={theme === control.theme}
-              className="ui-active:bg-base-content ui-active:bg-opacity-20 btn btn-ghost btn-sm justify-start"
+              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10 ui-disabled:pointer-events-none ui-disabled:opacity-25"
               onClick={() => setTheme(control.theme)}
             >
               {control.icon} {control.theme}

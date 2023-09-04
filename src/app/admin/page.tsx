@@ -1,8 +1,18 @@
 "use client";
 
-import EditModal from "@/components/modals/UserUpsertModal";
+import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
+import UpsertUserModal from "@/components/modals/UpsertUserModal";
 import { type RouterOutputs, api } from "@/utils/api";
-import { Cog6ToothIcon, UserPlusIcon } from "@heroicons/react/20/solid";
+import { Menu } from "@headlessui/react";
+import {
+  Cog6ToothIcon,
+  KeyIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+  PencilIcon,
+  TrashIcon,
+  UserPlusIcon,
+} from "@heroicons/react/20/solid";
 import { useState } from "react";
 
 export type User = RouterOutputs["user"]["getAll"][number];
@@ -36,22 +46,124 @@ export default function Page() {
                 <td>{user.email}</td>
                 <td>{user.isAdmin ? "Admin" : "User"}</td>
                 <td className="w-12">
-                  <button className="flex w-max items-center">
-                    <Cog6ToothIcon className="h-5 w-5 fill-accent hover:fill-accent-focus" />
-                  </button>
+                  <OptionsMenu
+                    userId={user.id}
+                    isDeactivated={user.isDeactivated}
+                    openEditModal={() => {
+                      setUser(user);
+                      setIsOpen(true);
+                    }}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setUser(null);
+            setIsOpen(true);
+          }}
           className="btn btn-sm mx-auto mt-5 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
         </button>
       </div>
-      <EditModal isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
+      <UpsertUserModal isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
     </>
   );
 }
+
+interface OptionsMenuProps {
+  userId: string;
+  isDeactivated: boolean;
+  openEditModal: () => void;
+}
+
+const OptionsMenu: React.FC<OptionsMenuProps> = ({
+  userId,
+  isDeactivated,
+  openEditModal,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const utils = api.useContext();
+
+  const { mutate: setIsDeactivated } = api.user.toggleActive.useMutation({
+    async onSuccess() {
+      await utils.user.getAll.invalidate();
+    },
+  });
+
+  const { mutate: deleteUser } = api.user.delete.useMutation({
+    async onSuccess() {
+      await utils.user.getAll.invalidate();
+    },
+  });
+
+  return (
+    <>
+      <Menu as="div" className="relative">
+        <Menu.Button className="text-accent hover:text-accent-focus ui-open:text-accent-focus">
+          <Cog6ToothIcon className="h-5 w-5" />
+        </Menu.Button>
+        <Menu.Items
+          as="ul"
+          className="menu rounded-box absolute right-0 z-20 mt-2 w-56 origin-top-right bg-base-300 p-2 shadow-md"
+        >
+          <Menu.Item as="li">
+            <button
+              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
+              onClick={openEditModal}
+            >
+              <PencilIcon className="h-4 w-4" aria-hidden="true" />
+              Edit
+            </button>
+          </Menu.Item>
+          <Menu.Item as="li">
+            <button
+              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
+              onClick={() => setIsOpen(true)}
+            >
+              <KeyIcon className="h-4 w-4" aria-hidden="true" />
+              Change Password
+            </button>
+          </Menu.Item>
+          <Menu.Item as="li">
+            <button
+              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
+              onClick={() =>
+                setIsDeactivated({ userId, isDeactivated: !isDeactivated })
+              }
+            >
+              {isDeactivated ? (
+                <>
+                  <LockOpenIcon className="h-4 w-4" aria-hidden="true" />
+                  Activate
+                </>
+              ) : (
+                <>
+                  <LockClosedIcon className="h-4 w-4" aria-hidden="true" />
+                  Deactivate
+                </>
+              )}
+            </button>
+          </Menu.Item>
+          <Menu.Item as="li">
+            <button
+              className="capitalize text-red-500 hover:text-red-600 ui-active:bg-base-content ui-active:bg-opacity-10"
+              onClick={() => deleteUser({ userId })}
+            >
+              <TrashIcon className="h-4 w-4" aria-hidden="true" />
+              Delete
+            </button>
+          </Menu.Item>
+        </Menu.Items>
+      </Menu>
+      <UpdatePasswordModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        userId={userId}
+      />
+    </>
+  );
+};
