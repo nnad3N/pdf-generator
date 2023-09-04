@@ -50,14 +50,11 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
           {...register("password")}
           error={errors.password}
         />
-        <div className="flex justify-between">
-          <button
-            onClick={() => setIsOpen(false)}
-            className="btn btn-outline mt-6"
-          >
+        <div className="mt-4 flex justify-between">
+          <button onClick={() => setIsOpen(false)} className="btn btn-outline">
             Cancel
           </button>
-          <button type="submit" className="btn btn-primary mt-6">
+          <button type="submit" className="btn btn-primary">
             Submit
           </button>
         </div>

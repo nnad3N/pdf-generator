@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
 import UpsertUserModal from "@/components/modals/UpsertUserModal";
 import { type RouterOutputs, api } from "@/utils/api";
@@ -47,7 +48,7 @@ export default function Page() {
                 <td>{user.isAdmin ? "Admin" : "User"}</td>
                 <td className="w-12">
                   <OptionsMenu
-                    userId={user.id}
+                    user={user}
                     isDeactivated={user.isDeactivated}
                     openEditModal={() => {
                       setUser(user);
@@ -75,17 +76,19 @@ export default function Page() {
 }
 
 interface OptionsMenuProps {
-  userId: string;
+  user: User;
   isDeactivated: boolean;
   openEditModal: () => void;
 }
 
 const OptionsMenu: React.FC<OptionsMenuProps> = ({
-  userId,
+  user,
   isDeactivated,
   openEditModal,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isUpdatePasswordModalOpen, setIsUpdatePasswordModalOpen] =
+    useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const utils = api.useContext();
 
   const { mutate: setIsDeactivated } = api.user.toggleActive.useMutation({
@@ -122,7 +125,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
           <Menu.Item as="li">
             <button
               className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => setIsOpen(true)}
+              onClick={() => setIsUpdatePasswordModalOpen(true)}
             >
               <KeyIcon className="h-4 w-4" aria-hidden="true" />
               Change Password
@@ -132,7 +135,10 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
             <button
               className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
               onClick={() =>
-                setIsDeactivated({ userId, isDeactivated: !isDeactivated })
+                setIsDeactivated({
+                  userId: user.id,
+                  isDeactivated: !isDeactivated,
+                })
               }
             >
               {isDeactivated ? (
@@ -151,7 +157,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
           <Menu.Item as="li">
             <button
               className="capitalize text-red-500 hover:text-red-600 ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => deleteUser({ userId })}
+              onClick={() => setIsConfirmModalOpen(true)}
             >
               <TrashIcon className="h-4 w-4" aria-hidden="true" />
               Delete
@@ -160,9 +166,18 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         </Menu.Items>
       </Menu>
       <UpdatePasswordModal
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        userId={userId}
+        isOpen={isUpdatePasswordModalOpen}
+        setIsOpen={setIsUpdatePasswordModalOpen}
+        userId={user.id}
+      />
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+        action={() => deleteUser({ userId: user.id })}
+        actionHeader={`Deleting user ${user.email}`}
+        actionDescription={`You are about to delete a user ${user.firstName} ${user.lastName}. This action is permament and cannot be reversed.`}
+        confirmText="Delete"
+        actionButtonColor="danger"
       />
     </>
   );
