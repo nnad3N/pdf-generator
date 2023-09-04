@@ -1,9 +1,21 @@
-"use client";
+// "use client";
 
-import { api } from "@/utils/api";
+import { prisma } from "@/server/db";
 
-export default function Page() {
-  const [data] = api.example.hello.useSuspenseQuery({ text: "from tRPC" });
+// import { api } from "@/utils/api";
 
-  return <p className="text-2xl">{data.greeting}</p>;
+export default async function Page() {
+  // const [data] = api.example.hello.useSuspenseQuery({ text: "from tRPC" });
+  const data = await prisma.user.findMany();
+  console.log("data: ", data);
+
+  return (
+    <div className="flex flex-col gap-5">
+      {data.map(({ id, firstName }) => (
+        <p key={id} className="text-2xl">
+          {firstName}
+        </p>
+      ))}
+    </div>
+  );
 }

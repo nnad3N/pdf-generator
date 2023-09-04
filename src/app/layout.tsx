@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   title: "PDF Generator",
 };
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default function RootLayout(props: {
+  children: React.ReactNode;
+  modal: React.ReactNode;
+}) {
   return (
     <html suppressHydrationWarning lang="en">
       <body className={["font-sans", fontSans.variable].join(" ")}>
@@ -28,6 +31,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
               <Navigation />
               <main className="flex h-full w-full items-center justify-center p-8">
                 {props.children}
+                {props.modal}
               </main>
             </div>
           </ThemeProvider>
