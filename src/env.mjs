@@ -10,9 +10,11 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]),
     VERCEL_URL: z
-    .string()
-    .optional()
-    .transform((v) => (v ? `https://${v}` : undefined)),
+      .string()
+      .optional()
+      .transform((v) => (v ? `https://${v}` : undefined)),
+    IRON_SESSION_PASSWORD: z.string().min(32),
+    IRON_SESSION_COOKIE_NAME: z.string().min(1),
   },
 
   /**
@@ -31,7 +33,9 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
-    VERCEL_URL: process.env.VERCEL_URL
+    VERCEL_URL: process.env.VERCEL_URL,
+    IRON_SESSION_PASSWORD: process.env.IRON_SESSION_PASSWORD,
+    IRON_SESSION_COOKIE_NAME: process.env.IRON_SESSION_COOKIE_NAME,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

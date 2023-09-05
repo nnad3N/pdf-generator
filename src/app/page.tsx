@@ -7,7 +7,7 @@ import { prisma } from "@/server/db";
 export default async function Page() {
   // const [data] = api.example.hello.useSuspenseQuery({ text: "from tRPC" });
   const data = await prisma.user.findMany();
-  console.log("data: ", data);
+  // console.log("data: ", data);
 
   return (
     <div className="flex flex-col gap-5">

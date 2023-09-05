@@ -1,61 +1,35 @@
-/**
- * YOU PROBABLY DON'T NEED TO EDIT THIS FILE, UNLESS:
- * 1. You want to modify request context (see Part 1).
- * 2. You want to create a new middleware or type of procedure (see Part 3).
- *
- * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
- * need to use are documented accordingly near the end.
- */
-import { initTRPC } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-
 import { prisma } from "@/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { type IronSessionData, unsealData } from "iron-session";
+import { cookies } from "next/headers";
+import { env } from "@/env.mjs";
 
-/**
- * 1. CONTEXT
- *
- * This section defines the "contexts" that are available in the backend API.
- *
- * These allow you to access things when processing a request, like the database, the session, etc.
- */
+type CreateContextOptions = {
+  session: IronSessionData;
+  resHeaders: Headers;
+};
 
-type CreateContextOptions = Record<string, never>;
-
-/**
- * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
- * it from here.
- *
- * Examples of things you may need it for:
- * - testing, so we don't have to mock Next.js' req/res
- * - tRPC's `createSSGHelpers`, where we don't have req/res
- *
- * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
- */
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
+    session: opts.session,
     prisma,
+    resHeaders: opts.resHeaders,
   };
 };
 
-/**
- * This is the actual context you will use in your router. It will be used to process every request
- * that goes through your tRPC endpoint.
- *
- * @see https://trpc.io/docs/context
- */
-export const createTRPCContext = (_opts: FetchCreateContextFnOptions) => {
-  return createInnerTRPCContext({});
-};
+export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
+  const session = await unsealData(cookies().get("iron-session")?.value ?? "", {
+    password: env.IRON_SESSION_PASSWORD,
+  });
 
-/**
- * 2. INITIALIZATION
- *
- * This is where the tRPC API is initialized, connecting the context and transformer. We also parse
- * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
- * errors on the backend.
- */
+  return createInnerTRPCContext({
+    session,
+    resHeaders: opts.resHeaders,
+  });
+};
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -71,25 +45,60 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   },
 });
 
-/**
- * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
- *
- * These are the pieces you use to build your tRPC API. You should import these a lot in the
- * "/src/server/api/routers" directory.
- */
-
-/**
- * This is how you create new routers and sub-routers in your tRPC API.
- *
- * @see https://trpc.io/docs/router
- */
 export const createTRPCRouter = t.router;
 
-/**
- * Public (unauthenticated) procedure
- *
- * This is the base piece you use to build new queries and mutations on your tRPC API. It does not
- * guarantee that a user querying is authorized, but you can still access user session data if they
- * are logged in.
- */
-export const publicProcedure = t.procedure;
+const enforceIsAuthed = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const user = await ctx.prisma.user.findUnique({
+    where: {
+      id: ctx.session.user.id,
+    },
+    select: {
+      isDeactivated: true,
+      isAdmin: true,
+    },
+  });
+
+  if (!user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+
+  if (user.isDeactivated) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "This account is deactivated.",
+    });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: {
+        user: ctx.session.user,
+      },
+      user,
+    },
+  });
+});
+const enforceIsAdmin = enforceIsAuthed.unstable_pipe(async ({ ctx, next }) => {
+  if (ctx.user.isAdmin !== true) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: {
+        user: ctx.session.user,
+      },
+    },
+  });
+});
+
+export const protectedProcedure = t.procedure.use(enforceIsAuthed);
+export const adminProcedure = t.procedure.use(enforceIsAdmin);

@@ -1,5 +1,6 @@
 "use client";
 
+import { logoutAction } from "@/app/actions";
 import { Menu } from "@headlessui/react";
 import {
   ArrowLeftOnRectangleIcon,
@@ -61,10 +62,10 @@ const Navigation = () => {
         <NavButton
           variant="button"
           isNavOpen={isNavOpen}
-          onClick={() => console.log("sign out")}
+          onClick={() => logoutAction()}
         >
           <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-          Sign Out
+          Logout
         </NavButton>
       </div>
     </nav>

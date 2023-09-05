@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { adminProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { hash } from "bcrypt";
 import { userSchema } from "@/utils/schemas";
 import { TRPCError } from "@trpc/server";
 
 export const userRouter = createTRPCRouter({
-  getAll: publicProcedure.query(({ ctx }) => {
+  getAll: adminProcedure.query(({ ctx }) => {
     return ctx.prisma.user.findMany({
       select: {
         id: true,
@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
-  upsert: publicProcedure
+  upsert: adminProcedure
     .input(
       z
         .object({
@@ -48,16 +48,16 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  toggleActive: publicProcedure
+  toggleActive: adminProcedure
     .input(z.object({ userId: z.string().uuid(), isDeactivated: z.boolean() }))
     .mutation(({ input, ctx }) => {
-      // if (input.userId === ctx.session.user.id) {
-      //   throw new TRPCError({
-      //     message:
-      //       "You can't activate/deactivate the same account as the one you are currently using.",
-      //     code: "BAD_REQUEST",
-      //   });
-      // }
+      if (input.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          message:
+            "You can't activate/deactivate the same account as the one you are currently using.",
+          code: "BAD_REQUEST",
+        });
+      }
 
       return ctx.prisma.user.update({
         where: {
@@ -68,7 +68,7 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  updatePassword: publicProcedure
+  updatePassword: adminProcedure
     .input(
       z.object({
         userId: z.string().uuid(),
@@ -86,16 +86,16 @@ export const userRouter = createTRPCRouter({
         },
       });
     }),
-  delete: publicProcedure
+  delete: adminProcedure
     .input(z.object({ userId: z.string().uuid() }))
     .mutation(({ input, ctx }) => {
-      // if (input.userId === ctx.session.user.id) {
-      //   throw new TRPCError({
-      //     message:
-      //       "You can't delete the same account as the one you are currently using.",
-      //     code: "BAD_REQUEST",
-      //   });
-      // }
+      if (input.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          message:
+            "You can't delete the same account as the one you are currently using.",
+          code: "BAD_REQUEST",
+        });
+      }
 
       return ctx.prisma.user.delete({
         where: {
