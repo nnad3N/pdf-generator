@@ -12,7 +12,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 
 const PasswordInput = forwardRef<HTMLInputElement, Props>(
   function PasswordInput({ label, error, className = "", ...rest }, ref) {
-    const [isChecked, setIsChecked] = useState(true);
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     return (
       <div className="form-control">
@@ -26,14 +26,16 @@ const PasswordInput = forwardRef<HTMLInputElement, Props>(
             } ${className}`}
             ref={ref}
             {...rest}
-            type={isChecked ? "text" : "password"}
+            type={isPasswordVisible ? "text" : "password"}
           />
           <button
             type="button"
-            onClick={() => setIsChecked((isChecked) => !isChecked)}
+            onClick={() =>
+              setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)
+            }
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded bg-primary p-1 hover:bg-primary-focus"
           >
-            {isChecked ? (
+            {isPasswordVisible ? (
               <EyeSlashIcon className="h-5 w-5" />
             ) : (
               <EyeIcon className="h-5 w-5" />

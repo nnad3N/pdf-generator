@@ -1,7 +1,6 @@
 import { env } from "@/env.mjs";
-import { sealData, type IronSessionData } from "iron-session";
+import { sealData, type IronSessionData, unsealData } from "iron-session";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 declare module "iron-session" {
   interface IronSessionData {
@@ -12,11 +11,6 @@ declare module "iron-session" {
     };
   }
 }
-
-export const destroyServerActionSession = () => {
-  cookies().delete(env.IRON_SESSION_COOKIE_NAME);
-  redirect("/login");
-};
 
 export const saveServerActionSession = async (data: IronSessionData) => {
   const sealedData = await sealData(data, {
@@ -33,4 +27,13 @@ export const saveServerActionSession = async (data: IronSessionData) => {
     expires: currentDate.getTime(), // one month from now
     path: "/",
   });
+};
+
+export const getServerActionSession = async () => {
+  return await unsealData<IronSessionData>(
+    cookies().get(env.IRON_SESSION_COOKIE_NAME)?.value ?? "",
+    {
+      password: env.IRON_SESSION_PASSWORD,
+    },
+  );
 };

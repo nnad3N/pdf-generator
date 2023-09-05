@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import { headers } from "next/headers";
 import { TRPCReactProvider, ThemeProvider } from "./providers";
 import Navigation from "@/components/Navigation";
+import { getServerActionSession } from "@/server/auth";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -14,7 +15,9 @@ export const metadata: Metadata = {
   title: "PDF Generator",
 };
 
-export default function RootLayout(props: { children: React.ReactNode }) {
+export default async function RootLayout(props: { children: React.ReactNode }) {
+  const session = await getServerActionSession();
+
   return (
     <html suppressHydrationWarning lang="en">
       <body className={["font-sans", fontSans.variable].join(" ")}>
@@ -25,7 +28,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             defaultTheme="system"
           >
             <div className="flex h-screen">
-              <Navigation />
+              {session.user && <Navigation user={session.user} />}
               <main className="flex h-full w-full items-center justify-center p-8">
                 {props.children}
               </main>

@@ -21,18 +21,21 @@ export const middleware = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  if (req.nextUrl.pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
+  // Destroy user session if is deactivated
   if (user.isDeactivated === true) {
     destroy();
 
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // Disable /login if user has session
+  if (req.nextUrl.pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // Disable /admin if user isn't an admin
   if (req.nextUrl.pathname.startsWith("/admin") && user.isAdmin !== true) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
   return res;

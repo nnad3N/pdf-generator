@@ -1,13 +1,12 @@
 "use server";
 
-import {
-  destroyServerActionSession,
-  saveServerActionSession,
-} from "@/server/auth";
+import { env } from "@/env.mjs";
+import { saveServerActionSession } from "@/server/auth";
 import { prisma } from "@/server/db";
 import { type LoginSchema, loginSchema } from "@/utils/schemas";
 import { type TRPC_ERROR_CODE_KEY } from "@trpc/server/rpc";
 import { compare } from "bcrypt";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 type LoginActionReturn = {
@@ -75,6 +74,6 @@ export const loginAction = async (
 };
 
 export const logoutAction = () => {
-  destroyServerActionSession();
+  cookies().delete(env.IRON_SESSION_COOKIE_NAME);
   redirect("/login");
 };

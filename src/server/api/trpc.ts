@@ -9,25 +9,22 @@ import { env } from "@/env.mjs";
 
 type CreateContextOptions = {
   session: IronSessionData;
-  resHeaders: Headers;
 };
 
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
-    resHeaders: opts.resHeaders,
   };
 };
 
-export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
+export const createTRPCContext = async (_opts: FetchCreateContextFnOptions) => {
   const session = await unsealData(cookies().get("iron-session")?.value ?? "", {
     password: env.IRON_SESSION_PASSWORD,
   });
 
   return createInnerTRPCContext({
     session,
-    resHeaders: opts.resHeaders,
   });
 };
 

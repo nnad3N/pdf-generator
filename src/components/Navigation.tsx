@@ -10,12 +10,17 @@ import {
   MoonIcon,
   SunIcon,
 } from "@heroicons/react/20/solid";
+import { type IronSessionData } from "iron-session";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useState, Children, useEffect } from "react";
 
-const Navigation = () => {
+interface Props {
+  user: NonNullable<IronSessionData["user"]>;
+}
+
+const Navigation: React.FC<Props> = ({ user }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(true);
 
@@ -52,10 +57,12 @@ const Navigation = () => {
           <KeyIcon className="h-6 w-6" />
           Admin Panel
         </NavButton>
-        <NavButton variant="link" isNavOpen={isNavOpen} href="/admin">
-          <KeyIcon className="h-6 w-6" />
-          Admin Panel
-        </NavButton>
+        {user.isAdmin && (
+          <NavButton variant="link" isNavOpen={isNavOpen} href="/admin">
+            <KeyIcon className="h-6 w-6" />
+            Admin Panel
+          </NavButton>
+        )}
       </div>
       <div>
         <ThemeControl isNavOpen={isNavOpen} />
