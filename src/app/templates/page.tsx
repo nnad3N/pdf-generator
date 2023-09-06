@@ -15,8 +15,8 @@ import { useState } from "react";
 
 const formatDate = (date: Date) =>
   new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "full",
-    timeStyle: "long",
+    dateStyle: "medium",
+    timeStyle: "medium",
   }).format(date);
 
 export type Template = RouterOutputs["template"]["getAll"][number];
