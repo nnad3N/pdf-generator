@@ -16,3 +16,21 @@ export const userSchema = z.object({
 });
 
 export type UserSchema = z.infer<typeof userSchema>;
+
+export const templateSchema = z.object({
+  name: z.string().min(1, { message: "Template name is required." }),
+  filename: z
+    .string()
+    .min(1, { message: "Template file is required." })
+    .endsWith(".html", { message: "Only HTML files are supported." }),
+  variables: z.array(
+    z.object({
+      id: z.string().cuid(),
+      label: z.string().min(1, { message: "Variable label is required." }),
+      name: z.string().min(1, { message: "Variable name is required." }),
+      type: z.string(),
+    }),
+  ),
+});
+
+export type TemplateSchema = z.infer<typeof templateSchema>;
