@@ -11,7 +11,7 @@ interface Props {
 
 const FileInput: React.FC<Props> = ({ filename, handleFile, error }) => {
   return (
-    <div className="form-control pt-2">
+    <div className="form-control">
       <button
         type="button"
         className={`focus-visible:outline-offset-3 w-full focus-visible:rounded-sm focus-visible:outline-none ${

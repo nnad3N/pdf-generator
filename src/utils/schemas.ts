@@ -23,9 +23,10 @@ export const templateSchema = z.object({
     .string()
     .min(1, { message: "Template file is required." })
     .endsWith(".html", { message: "Only HTML files are supported." }),
+  file: z.string().optional(),
   variables: z.array(
     z.object({
-      id: z.string().cuid(),
+      id: z.string().optional(),
       label: z.string().min(1, { message: "Variable label is required." }),
       name: z.string().min(1, { message: "Variable name is required." }),
       type: z.string(),

@@ -6,6 +6,8 @@ import {
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   ComputerDesktopIcon,
+  DocumentIcon,
+  HomeIcon,
   KeyIcon,
   MoonIcon,
   SunIcon,
@@ -54,8 +56,12 @@ const Navigation: React.FC<Props> = ({ user }) => {
           <Bars3Icon className="h-7 w-7" />
         </button>
         <NavButton variant="link" isNavOpen={isNavOpen} href="/">
-          <KeyIcon className="h-6 w-6" />
-          Admin Panel
+          <HomeIcon className="h-6 w-6" />
+          Dashboard
+        </NavButton>
+        <NavButton variant="link" isNavOpen={isNavOpen} href="/templates">
+          <DocumentIcon className="h-6 w-6" />
+          Templates
         </NavButton>
         {user.isAdmin && (
           <NavButton variant="link" isNavOpen={isNavOpen} href="/admin">

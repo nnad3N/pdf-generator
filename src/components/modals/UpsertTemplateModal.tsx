@@ -2,21 +2,27 @@
 
 import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { type TemplateSchema, templateSchema } from "@/utils/schemas";
 import { api } from "@/utils/api";
 import Input from "../form/Input";
 import { type Template } from "@/app/templates/page";
 import ModalRoot from "./ModalRoot";
-import { useEffect } from "react";
 import FileInput from "../form/FileInput";
 import toBase64 from "@/utils/toBase64";
+import TemplateVariables from "../TemplateVariables";
 // import toBase64 from "@/utils/toBase64";
 
 const defaultValues: TemplateSchema = {
   name: "",
   filename: "",
-  variables: [],
+  variables: [
+    {
+      label: "",
+      name: "",
+      type: "text",
+    },
+  ],
 };
 
 interface Props {
@@ -30,8 +36,21 @@ const UpsertTemplateModal: React.FC<Props> = ({
   setIsOpen,
   template,
 }) => {
+  const methods = useForm<TemplateSchema>({
+    mode: "onSubmit",
+    reValidateMode: "onBlur",
+    resolver: zodResolver(templateSchema),
+    defaultValues,
+    values: template
+      ? {
+          name: template.name,
+          filename: template.filename,
+          variables: template.variables,
+        }
+      : defaultValues,
+  });
+
   const {
-    reset,
     setValue,
     trigger,
     setError,
@@ -39,33 +58,15 @@ const UpsertTemplateModal: React.FC<Props> = ({
     register,
     handleSubmit,
     formState: { errors, isDirty },
-  } = useForm<TemplateSchema>({
-    mode: "onSubmit",
-    reValidateMode: "onBlur",
-    resolver: zodResolver(templateSchema),
-    defaultValues,
+  } = methods;
+
+  const utils = api.useContext();
+  const { mutate: upsert } = api.template.upsert.useMutation({
+    async onSuccess() {
+      await utils.template.getAll.invalidate();
+      setIsOpen(false);
+    },
   });
-
-  useEffect(() => {
-    reset(
-      template
-        ? {
-            name: template.name,
-            filename: template.filename,
-            variables: template.variables,
-          }
-        : defaultValues,
-    );
-    //eslint-disable-next-line
-  }, [template]);
-
-  // const utils = api.useContext();
-  // const { mutate: upsert } = api.user.upsert.useMutation({
-  //   async onSuccess() {
-  //     await utils.user.getAll.invalidate();
-  //     setIsOpen(false);
-  //   },
-  // });
 
   const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -79,23 +80,20 @@ const UpsertTemplateModal: React.FC<Props> = ({
 
       try {
         const base64String = await toBase64(file);
-        console.log(base64String);
-        // store.setFile(base64String);
-        // setIsFileInputDirty(true);
+        setValue("file", base64String, { shouldDirty: true });
       } catch (error) {
         console.error(error);
         setError("filename", { message: "Could not upload file." });
       }
     }
-    event.target.value = "";
   };
 
   return (
     <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
       <Dialog.Panel
         as="form"
-        onSubmit={handleSubmit((data) => console.log(data))}
-        className="modal-box flex w-96 flex-col gap-y-2"
+        onSubmit={handleSubmit((data) => upsert({ id: template?.id, ...data }))}
+        className="modal-box flex max-w-4xl flex-col gap-y-4"
       >
         <Input
           label="Template Name"
@@ -107,7 +105,9 @@ const UpsertTemplateModal: React.FC<Props> = ({
           filename={getValues("filename")}
           error={errors.filename}
         />
-
+        <FormProvider {...methods}>
+          <TemplateVariables />
+        </FormProvider>
         <div className="mt-4 flex justify-between">
           <button onClick={() => setIsOpen(false)} className="btn btn-outline">
             Cancel

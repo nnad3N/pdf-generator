@@ -4,7 +4,7 @@ const toBase64 = (file: File): Promise<string> => {
     reader.readAsDataURL(file);
     reader.onload = () => {
       if (reader.result && typeof reader.result === "string") {
-        resolve(reader.result.replace("data:", "").replace(/^.+,/, ""));
+        resolve(reader.result.replace("data:", "").replace(/^.+,/, "")); // remove the beginning of the string data:text/html;base64,
       }
     };
     reader.onerror = (error) => {

@@ -9,7 +9,6 @@ import PasswordInput from "@/components/form/PasswordInput";
 import Input from "../form/Input";
 import { type User } from "@/app/admin/page";
 import ModalRoot from "./ModalRoot";
-import { useEffect } from "react";
 
 const defaultValues: UserSchema = {
   firstName: "",
@@ -27,7 +26,6 @@ interface Props {
 
 const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   const {
-    reset,
     register,
     handleSubmit,
     formState: { errors, isDirty },
@@ -36,22 +34,16 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
     reValidateMode: "onBlur",
     resolver: zodResolver(userSchema),
     defaultValues,
+    values: user
+      ? {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          password: "placeholder", // must validate with the user schema
+          isAdmin: user.isAdmin,
+        }
+      : defaultValues,
   });
-
-  useEffect(() => {
-    reset(
-      user
-        ? {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: "placeholder", // must validate with the user schema
-            isAdmin: user.isAdmin,
-          }
-        : defaultValues,
-    );
-    //eslint-disable-next-line
-  }, [user]);
 
   const utils = api.useContext();
   const { mutate: upsert } = api.user.upsert.useMutation({
