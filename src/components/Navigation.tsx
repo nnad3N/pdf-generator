@@ -3,6 +3,7 @@
 import { logoutAction } from "@/app/actions";
 import { Menu } from "@headlessui/react";
 import {
+  ArchiveBoxIcon,
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   ComputerDesktopIcon,
@@ -11,7 +12,13 @@ import {
   KeyIcon,
   MoonIcon,
   SunIcon,
-} from "@heroicons/react/20/solid";
+} from "@heroicons/react/24/solid";
+import {
+  ArchiveBoxIcon as ArchiveBoxIconOutline,
+  DocumentIcon as DocumentIconOutline,
+  HomeIcon as HomeIconOutline,
+  KeyIcon as KeyIconOutline,
+} from "@heroicons/react/24/outline";
 import { type IronSessionData } from "iron-session";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -21,6 +28,50 @@ import React, { useState, Children, useEffect } from "react";
 interface Props {
   user: NonNullable<IronSessionData["user"]>;
 }
+
+type Link = {
+  href: "/" | "/pdfs" | "/templates" | "/admin";
+  label: string;
+  icons: {
+    active: React.ElementType;
+    inactive: React.ElementType;
+  };
+};
+
+const links: Link[] = [
+  {
+    href: "/",
+    label: "Dashboard",
+    icons: {
+      active: HomeIcon,
+      inactive: HomeIconOutline,
+    },
+  },
+  {
+    href: "/pdfs",
+    label: "PDF Files",
+    icons: {
+      active: ArchiveBoxIcon,
+      inactive: ArchiveBoxIconOutline,
+    },
+  },
+  {
+    href: "/templates",
+    label: "Templates",
+    icons: {
+      active: DocumentIcon,
+      inactive: DocumentIconOutline,
+    },
+  },
+  {
+    href: "/admin",
+    label: "Admin",
+    icons: {
+      active: KeyIcon,
+      inactive: KeyIconOutline,
+    },
+  },
+];
 
 const Navigation: React.FC<Props> = ({ user }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -55,19 +106,18 @@ const Navigation: React.FC<Props> = ({ user }) => {
         <button onClick={handleToggleNav} className="btn btn-square btn-ghost">
           <Bars3Icon className="h-7 w-7" />
         </button>
-        <NavButton variant="link" isNavOpen={isNavOpen} href="/">
-          <HomeIcon className="h-6 w-6" />
-          Dashboard
-        </NavButton>
-        <NavButton variant="link" isNavOpen={isNavOpen} href="/templates">
-          <DocumentIcon className="h-6 w-6" />
-          Templates
-        </NavButton>
-        {user.isAdmin && (
-          <NavButton variant="link" isNavOpen={isNavOpen} href="/admin">
-            <KeyIcon className="h-6 w-6" />
-            Admin Panel
-          </NavButton>
+        {links.map(({ href, label, icons }) =>
+          href === "/admin" && !user.isAdmin ? null : (
+            <NavButton
+              key={href}
+              variant="link"
+              isNavOpen={isNavOpen}
+              href={href}
+              icons={icons}
+            >
+              {label}
+            </NavButton>
+          ),
         )}
       </div>
       <div>
@@ -94,6 +144,7 @@ interface BaseNavButtonProps<T extends "link" | "button" | "menu-button"> {
 
 interface LinkNavButtonProps extends BaseNavButtonProps<"link"> {
   href: string;
+  icons: Link["icons"];
 }
 
 interface ButtonNavButtonProps extends BaseNavButtonProps<"button"> {
@@ -115,7 +166,11 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
   switch (props.variant) {
     case "link":
       const isActive = pathname === props.href;
-
+      const icon = isActive ? (
+        <props.icons.active className="h-6 w-6" />
+      ) : (
+        <props.icons.inactive className="h-6 w-6" />
+      );
       return (
         <Link
           className={`btn ${isActive ? "btn-neutral" : "btn-ghost"} ${
@@ -123,7 +178,13 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
           }`}
           href={props.href}
         >
-          {dynamicChildren}
+          {props.isNavOpen ? (
+            <>
+              {icon} {props.children}
+            </>
+          ) : (
+            icon
+          )}
         </Link>
       );
     case "button":
