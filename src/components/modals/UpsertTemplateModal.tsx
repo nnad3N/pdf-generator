@@ -62,7 +62,10 @@ const UpsertTemplateModal: React.FC<Props> = ({
   const utils = api.useContext();
   const { mutate: upsert } = api.template.upsert.useMutation({
     async onSuccess() {
-      await utils.template.getAll.invalidate();
+      await Promise.all([
+        utils.template.getAll.invalidate(),
+        utils.pdf.getTemplates.invalidate(),
+      ]);
       setIsOpen(false);
     },
   });
@@ -111,12 +114,8 @@ const UpsertTemplateModal: React.FC<Props> = ({
           <button onClick={() => setIsOpen(false)} className="btn btn-outline">
             Cancel
           </button>
-          <button
-            disabled={!isDirty || Object.keys(errors).length !== 0}
-            type="submit"
-            className="btn btn-primary"
-          >
-            Submit
+          <button disabled={!isDirty} type="submit" className="btn btn-primary">
+            {template ? "Update" : "Create"}
           </button>
         </div>
       </Dialog.Panel>

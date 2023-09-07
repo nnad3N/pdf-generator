@@ -4,10 +4,11 @@ import { type RouterOutputs, api } from "@/utils/api";
 import { useForm } from "react-hook-form";
 import { type PDFSchema, pdfSchema } from "@/utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Combobox } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 import Input from "@/components/form/Input";
+import saveFile from "@/utils/saveFile";
 
 export type PDFTemplate = RouterOutputs["pdf"]["getTemplates"][number];
 
@@ -16,6 +17,11 @@ export default function Page() {
   const [selectedTemplate, setSelectedTemplate] = useState<PDFTemplate | null>(
     templates?.[0] ?? null,
   );
+
+  // updating the templates after invalidation
+  useEffect(() => {
+    setSelectedTemplate(templates?.[0] ?? null);
+  }, [templates]);
 
   const {
     register,
@@ -27,34 +33,55 @@ export default function Page() {
     resolver: zodResolver(pdfSchema),
     values: selectedTemplate
       ? {
+          templateId: selectedTemplate.id,
+          filename: "",
           variables: selectedTemplate.variables,
         }
       : undefined,
   });
 
+  const { mutate, isLoading } = api.pdf.create.useMutation({
+    onSuccess: saveFile,
+  });
+
   return (
-    <div className="rounded-box w-full max-w-md bg-base-200 p-5">
+    <div className="rounded-box w-full max-w-xl bg-base-200 p-5">
       <SelectCombobox
         templates={templates}
         selectedTemplate={selectedTemplate}
         setSelectedTemplate={setSelectedTemplate}
       />
-
       <form
         className="mt-2 flex flex-col gap-y-2"
-        onSubmit={handleSubmit((data) => console.log(data))}
+        onSubmit={handleSubmit((data) => mutate(data))}
       >
-        {selectedTemplate?.variables.map(({ id, label, type }, index) => (
-          <Input
-            key={id}
-            label={label}
-            {...register(`variables.${index}.value`)}
-            error={errors.variables?.[index]?.value}
-            type={type}
-          />
-        ))}
-        <button disabled={!isDirty} className="btn btn-primary mt-4">
-          Generate PDF
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+          {selectedTemplate?.variables.map(({ id, label, type }, index) => (
+            <Input
+              key={id}
+              label={label}
+              {...register(`variables.${index}.value`)}
+              error={errors.variables?.[index]?.value}
+              type={type}
+            />
+          ))}
+        </div>
+        <Input
+          label="Filename"
+          {...register("filename")}
+          error={errors.filename}
+        />
+        <button
+          disabled={!isDirty || isLoading}
+          className="btn btn-primary mt-4"
+        >
+          {isLoading ? (
+            <>
+              <span className="loading loading-spinner"></span> Generating
+            </>
+          ) : (
+            "Generate PDF"
+          )}
         </button>
       </form>
     </div>

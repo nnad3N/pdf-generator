@@ -93,7 +93,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
             Cancel
           </button>
           <button disabled={!isDirty} type="submit" className="btn btn-primary">
-            Submit
+            {user ? "Update" : "Create"}
           </button>
         </div>
       </Dialog.Panel>

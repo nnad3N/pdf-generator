@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
+import { pdfSchema } from "@/utils/schemas";
+import puppeteer from "puppeteer";
 
 export const pdfRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -27,11 +29,59 @@ export const pdfRouter = createTRPCRouter({
             label: true,
             type: true,
             value: true,
+            name: true,
           },
         },
       },
     });
   }),
+  create: protectedProcedure
+    .input(pdfSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { file } = await ctx.prisma.template.findUniqueOrThrow({
+        where: {
+          id: input.templateId,
+        },
+        select: {
+          file: true,
+        },
+      });
+
+      const browser = await puppeteer.launch({
+        headless: "new",
+      });
+      const page = await browser.newPage();
+
+      let html = Buffer.from(file).toString("utf-8");
+      input.variables.forEach(
+        ({ name, value }) => (html = html.replace(name, value)),
+      );
+
+      await page.setContent(html, { waitUntil: "domcontentloaded" });
+      await page.emulateMediaType("screen");
+
+      const pdf = await page.pdf({
+        margin: { top: "75px", right: "50px", bottom: "75px", left: "50px" },
+        printBackground: true,
+        format: "A4",
+      });
+
+      await Promise.all([
+        browser.close(),
+        ctx.prisma.pdf.create({
+          data: {
+            filename: input.filename + ".pdf",
+            file: pdf,
+            userId: ctx.session.user.id,
+          },
+        }),
+      ]);
+
+      return {
+        filename: input.filename,
+        file: Buffer.from(pdf).toString("base64"),
+      };
+    }),
   download: protectedProcedure
     .input(
       z.object({
@@ -39,16 +89,18 @@ export const pdfRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const { file } = await ctx.prisma.pdf.findUniqueOrThrow({
+      const { file, filename } = await ctx.prisma.pdf.findUniqueOrThrow({
         where: {
           id: input.pdfId,
         },
         select: {
+          filename: true,
           file: true,
         },
       });
 
       return {
+        filename,
         file: Buffer.from(file).toString("base64"),
       };
     }),

@@ -21,7 +21,7 @@ const TemplateVariables = () => {
         <thead>
           <tr className="border-none text-center [&_th]:pb-1">
             <th>Label</th>
-            <th>Variable Name</th>
+            <th>Variable</th>
             <th>Type</th>
             <th></th>
           </tr>

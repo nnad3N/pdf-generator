@@ -28,7 +28,12 @@ export const templateSchema = z.object({
     z.object({
       id: z.string().optional(),
       label: z.string().min(1, { message: "Variable label is required." }),
-      name: z.string().min(1, { message: "Variable name is required." }),
+      name: z
+        .string()
+        .min(1, { message: "Variable name is required." })
+        .refine((value) => /^{{\S.*\S}}$/.test(value), {
+          message: "Variable needs to have {{variable}} shape.",
+        }),
       type: z.string(),
     }),
   ),
@@ -37,8 +42,11 @@ export const templateSchema = z.object({
 export type TemplateSchema = z.infer<typeof templateSchema>;
 
 export const pdfSchema = z.object({
+  templateId: z.string().uuid(),
+  filename: z.string().min(1, { message: "Please provide the PDF name." }),
   variables: z.array(
     z.object({
+      name: z.string().min(1),
       value: z.string().min(1, { message: "Variable value is required." }),
     }),
   ),
