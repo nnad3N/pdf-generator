@@ -35,3 +35,13 @@ export const templateSchema = z.object({
 });
 
 export type TemplateSchema = z.infer<typeof templateSchema>;
+
+export const pdfSchema = z.object({
+  variables: z.array(
+    z.object({
+      value: z.string().min(1, { message: "Variable value is required." }),
+    }),
+  ),
+});
+
+export type PDFSchema = z.infer<typeof pdfSchema>;

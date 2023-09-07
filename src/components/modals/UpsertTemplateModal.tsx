@@ -11,7 +11,6 @@ import ModalRoot from "./ModalRoot";
 import FileInput from "../form/FileInput";
 import toBase64 from "@/utils/toBase64";
 import TemplateVariables from "../TemplateVariables";
-// import toBase64 from "@/utils/toBase64";
 
 const defaultValues: TemplateSchema = {
   name: "",
