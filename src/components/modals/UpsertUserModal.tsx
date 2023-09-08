@@ -27,6 +27,7 @@ interface Props {
 const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors, isDirty },
   } = useForm<UserSchema>({
@@ -36,10 +37,10 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
     defaultValues,
     values: user
       ? {
+          userId: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
-          password: "placeholder", // must validate with the user schema
           isAdmin: user.isAdmin,
         }
       : defaultValues,
@@ -50,6 +51,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
     async onSuccess() {
       await utils.user.getAll.invalidate();
       setIsOpen(false);
+      reset();
     },
   });
 
@@ -57,7 +59,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
     <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
       <Dialog.Panel
         as="form"
-        onSubmit={handleSubmit((data) => upsert({ ...data, userId: user?.id }))}
+        onSubmit={handleSubmit((data) => upsert(data))}
         className="modal-box flex w-96 flex-col gap-y-2"
       >
         <Input

@@ -2,13 +2,10 @@ import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { type TemplateSchema, templateSchema } from "@/utils/schemas";
 
-type WithoutUndefined<T> = {
-  [K in keyof T]-?: NonNullable<T[K]>;
+type Concrete<Type> = {
+  [Property in keyof Type]-?: Type[Property];
 };
-
-type VariablesToUpdate = WithoutUndefined<
-  TemplateSchema["variables"][number]
->[];
+type VariableToUpdate = Concrete<TemplateSchema["variables"][number]>;
 
 export const templateRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -66,7 +63,7 @@ export const templateRouter = createTRPCRouter({
             name: input.name,
             filename: input.filename,
             file,
-            userId: ctx.session.user.id,
+            userId: ctx.session.user.userId,
             variables: {
               create: input.variables,
             },
@@ -79,13 +76,13 @@ export const templateRouter = createTRPCRouter({
         const filename = input.file ? input.filename : undefined;
         const file = input.file ? Buffer.from(input.file, "base64") : undefined;
 
-        const variablesToUpdate: VariablesToUpdate = [];
+        const variablesToUpdate: VariableToUpdate[] = [];
 
         const variablesToCreate = input.variables.filter((variable) => {
           if (typeof variable.id === "undefined") {
             return true;
           } else if (typeof variable.id === "string") {
-            variablesToUpdate.push(variable as VariablesToUpdate[number]);
+            variablesToUpdate.push(variable as VariableToUpdate);
           }
           return false;
         });
@@ -103,7 +100,7 @@ export const templateRouter = createTRPCRouter({
               name: input.name,
               filename,
               file,
-              userId: ctx.session.user.id,
+              userId: ctx.session.user.userId,
               variables: {
                 create: variablesToCreate,
                 deleteMany: variablesToDelete,
@@ -152,7 +149,7 @@ export const templateRouter = createTRPCRouter({
           name: `${name} - Copy`,
           filename,
           file,
-          userId: ctx.session.user.id,
+          userId: ctx.session.user.userId,
           variables: {
             create: variables,
           },

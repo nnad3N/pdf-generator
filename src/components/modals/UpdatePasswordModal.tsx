@@ -9,10 +9,10 @@ import ModalRoot from "./ModalRoot";
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  userId: string;
+  email: string;
 }
 
-const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
+const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
   const {
     register,
     handleSubmit,
@@ -41,7 +41,7 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
       <Dialog.Panel
         as="form"
         onSubmit={handleSubmit(({ password }) =>
-          updatePassword({ userId, password }),
+          updatePassword({ email, password }),
         )}
         className="modal-box flex w-96 flex-col gap-y-4"
       >

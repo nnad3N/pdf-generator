@@ -1,39 +1,32 @@
 import { env } from "@/env.mjs";
-import { sealData, type IronSessionData, unsealData } from "iron-session";
+import { lucia } from "lucia";
+import { nextjs } from "lucia/middleware";
+import { prisma } from "@lucia-auth/adapter-prisma";
+import { prisma as client } from "@/server/db";
+import "lucia/polyfill/node";
+import { cache } from "react";
 import { cookies } from "next/headers";
 
-declare module "iron-session" {
-  interface IronSessionData {
-    user?: {
-      id: string;
-      isAdmin: boolean;
-      isDeactivated: boolean;
-    };
-  }
-}
+export const auth = lucia({
+  env: env.NODE_ENV === "production" ? "PROD" : "DEV",
+  middleware: nextjs(),
+  sessionCookie: {
+    name: env.SESSION_COOKIE_NAME,
+    expires: false,
+  },
+  getUserAttributes: ({ isAdmin, isDeactivated }) => ({
+    isAdmin,
+    isDeactivated,
+  }),
+  adapter: prisma(client),
+});
 
-export const saveServerActionSession = async (data: IronSessionData) => {
-  const sealedData = await sealData(data, {
-    password: env.IRON_SESSION_PASSWORD,
+export type Auth = typeof auth;
+
+export const getPageSession = cache(() => {
+  const authRequest = auth.handleRequest({
+    request: null,
+    cookies,
   });
-
-  const currentDate = new Date();
-  currentDate.setMonth(currentDate.getMonth() + 1);
-
-  cookies().set(env.IRON_SESSION_COOKIE_NAME, sealedData, {
-    sameSite: "lax",
-    secure: env.NODE_ENV === "production",
-    httpOnly: true,
-    expires: currentDate.getTime(), // one month from now
-    path: "/",
-  });
-};
-
-export const getServerActionSession = async () => {
-  return await unsealData<IronSessionData>(
-    cookies().get(env.IRON_SESSION_COOKIE_NAME)?.value ?? "",
-    {
-      password: env.IRON_SESSION_PASSWORD,
-    },
-  );
-};
+  return authRequest.validate();
+});

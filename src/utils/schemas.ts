@@ -7,13 +7,26 @@ export const loginSchema = z.object({
 
 export type LoginSchema = z.infer<typeof loginSchema>;
 
-export const userSchema = z.object({
-  firstName: z.string().min(1, { message: "First Name is required." }),
-  lastName: z.string().min(1, { message: "Last Name is required." }),
-  email: z.string().email(),
-  password: z.string().min(1, { message: "Password is required." }),
-  isAdmin: z.boolean(),
-});
+export const userSchema = z
+  .object({
+    userId: z.string().optional(),
+    firstName: z.string().min(1, { message: "First Name is required." }),
+    lastName: z.string().min(1, { message: "Last Name is required." }),
+    email: z.string().email(),
+    password: z.string().optional(),
+    isAdmin: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      if (data.userId && !data.password) return true;
+      if (!data.userId && data.password) return true;
+      return false;
+    },
+    {
+      message: "Password is required.",
+      path: ["password"],
+    },
+  );
 
 export type UserSchema = z.infer<typeof userSchema>;
 

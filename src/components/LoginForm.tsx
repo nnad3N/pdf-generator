@@ -5,11 +5,14 @@ import PasswordInput from "@/components/form/PasswordInput";
 import { type LoginSchema, loginSchema } from "@/utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { loginAction } from "../actions";
+import { loginAction } from "@/app/actions";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Page() {
-  const [formError, setFormError] = useState<string | null>(null);
+const LoginForm = () => {
+  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -22,10 +25,14 @@ export default function Page() {
   });
 
   const handleLogin: SubmitHandler<LoginSchema> = async (data) => {
-    setFormError(null);
+    setFormError(undefined);
     try {
       const res = await loginAction(data);
       switch (res.code) {
+        case "SUCCESS":
+          router.refresh();
+
+          break;
         case "NOT_FOUND":
         case "FORBIDDEN":
           setFormError(res.message);
@@ -67,4 +74,6 @@ export default function Page() {
       </button>
     </form>
   );
-}
+};
+
+export default LoginForm;

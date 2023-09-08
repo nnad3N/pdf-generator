@@ -3,7 +3,6 @@
 import { logoutAction } from "@/app/actions";
 import { Menu } from "@headlessui/react";
 import {
-  ArchiveBoxIcon,
   ArrowLeftOnRectangleIcon,
   Bars3Icon,
   ComputerDesktopIcon,
@@ -14,19 +13,18 @@ import {
   SunIcon,
 } from "@heroicons/react/24/solid";
 import {
-  ArchiveBoxIcon as ArchiveBoxIconOutline,
   DocumentIcon as DocumentIconOutline,
   HomeIcon as HomeIconOutline,
   KeyIcon as KeyIconOutline,
 } from "@heroicons/react/24/outline";
-import { type IronSessionData } from "iron-session";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useState, Children, useEffect } from "react";
+import { type User } from "lucia";
 
 interface Props {
-  user: NonNullable<IronSessionData["user"]>;
+  user: User;
 }
 
 type Link = {
@@ -45,14 +43,6 @@ const links: Link[] = [
     icons: {
       active: HomeIcon,
       inactive: HomeIconOutline,
-    },
-  },
-  {
-    href: "/pdfs",
-    label: "PDF Files",
-    icons: {
-      active: ArchiveBoxIcon,
-      inactive: ArchiveBoxIconOutline,
     },
   },
   {
@@ -76,6 +66,7 @@ const links: Link[] = [
 const Navigation: React.FC<Props> = ({ user }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -125,7 +116,10 @@ const Navigation: React.FC<Props> = ({ user }) => {
         <NavButton
           variant="button"
           isNavOpen={isNavOpen}
-          onClick={() => logoutAction()}
+          onClick={async () => {
+            await logoutAction();
+            router.refresh();
+          }}
         >
           <ArrowLeftOnRectangleIcon className="h-6 w-6" />
           Logout

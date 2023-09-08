@@ -168,7 +168,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
       <UpdatePasswordModal
         isOpen={isUpdatePasswordModalOpen}
         setIsOpen={setIsUpdatePasswordModalOpen}
-        userId={user.id}
+        email={user.email}
       />
       <ConfirmModal
         isOpen={isConfirmModalOpen}

@@ -9,7 +9,7 @@ import Input from "../form/Input";
 import { type Template } from "@/app/templates/page";
 import ModalRoot from "./ModalRoot";
 import FileInput from "../form/FileInput";
-import toBase64 from "@/utils/toBase64";
+import fileToBase64 from "@/utils/base64";
 import TemplateVariables from "../TemplateVariables";
 
 const defaultValues: TemplateSchema = {
@@ -81,7 +81,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
       if (errors.filename) return;
 
       try {
-        const base64String = await toBase64(file);
+        const base64String = await fileToBase64(file);
         setValue("file", base64String, { shouldDirty: true });
       } catch (error) {
         console.error(error);

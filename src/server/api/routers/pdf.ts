@@ -13,7 +13,6 @@ export const pdfRouter = createTRPCRouter({
             id: true,
             label: true,
             type: true,
-            value: true,
             name: true,
           },
         },
@@ -51,16 +50,7 @@ export const pdfRouter = createTRPCRouter({
         format: "A4",
       });
 
-      await Promise.all([
-        browser.close(),
-        ctx.prisma.pdf.create({
-          data: {
-            filename: input.filename + ".pdf",
-            file: pdf,
-            userId: ctx.session.user.id,
-          },
-        }),
-      ]);
+      await browser.close();
 
       return {
         filename: input.filename,

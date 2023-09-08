@@ -3,25 +3,26 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { prisma } from "@/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { type IronSessionData, unsealData } from "iron-session";
 import { cookies } from "next/headers";
 import { env } from "@/env.mjs";
+import { auth } from "../auth";
+import { type Session } from "lucia";
 
 type CreateContextOptions = {
-  session: IronSessionData;
+  session: Session | null;
 };
 
 const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    auth,
   };
 };
 
 export const createTRPCContext = async (_opts: FetchCreateContextFnOptions) => {
-  const session = await unsealData(cookies().get("iron-session")?.value ?? "", {
-    password: env.IRON_SESSION_PASSWORD,
-  });
+  const sessionId = cookies().get(env.SESSION_COOKIE_NAME)?.value;
+  const session = sessionId ? await auth.validateSession(sessionId) : null;
 
   return createInnerTRPCContext({
     session,
@@ -45,27 +46,12 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 export const createTRPCRouter = t.router;
 
 const enforceIsAuthed = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.session.user) {
+  if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  const user = await ctx.prisma.user.findUnique({
-    where: {
-      id: ctx.session.user.id,
-    },
-    select: {
-      isDeactivated: true,
-      isAdmin: true,
-    },
-  });
-
-  if (!user) {
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-    });
-  }
-
-  if (user.isDeactivated) {
+  if (ctx.session.user.isDeactivated) {
+    await auth.invalidateAllUserSessions(ctx.session.user.userId);
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "This account is deactivated.",
@@ -75,25 +61,18 @@ const enforceIsAuthed = t.middleware(async ({ ctx, next }) => {
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: {
-        user: ctx.session.user,
-      },
-      user,
+      session: ctx.session,
     },
   });
 });
 const enforceIsAdmin = enforceIsAuthed.unstable_pipe(async ({ ctx, next }) => {
-  if (ctx.user.isAdmin !== true) {
+  if (ctx.session.user.isAdmin !== true) {
+    await auth.invalidateAllUserSessions(ctx.session.user.userId);
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
   return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: {
-        user: ctx.session.user,
-      },
-    },
+    ctx,
   });
 });
 
