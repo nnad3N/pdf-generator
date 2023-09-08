@@ -35,9 +35,10 @@ export default function Page() {
       ? {
           templateId: selectedTemplate.id,
           filename: "",
-          variables: selectedTemplate.variables.map(({ name }) => ({
+          variables: selectedTemplate.variables.map(({ name, type }) => ({
             name,
             value: "",
+            type,
           })),
         }
       : undefined,

@@ -61,6 +61,7 @@ export const pdfSchema = z.object({
     z.object({
       name: z.string().min(1),
       value: z.string().min(1, { message: "Variable value is required." }),
+      type: z.string().min(1),
     }),
   ),
 });
