@@ -3,6 +3,7 @@
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
 import { type RouterOutputs, api } from "@/utils/api";
+import { formatDateToMedium } from "@/utils/date";
 import { Menu } from "@headlessui/react";
 import {
   Cog6ToothIcon,
@@ -12,12 +13,6 @@ import {
   TrashIcon,
 } from "@heroicons/react/20/solid";
 import { useState } from "react";
-
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    dateStyle: "medium",
-    timeStyle: "medium",
-  }).format(date);
 
 export type Template = RouterOutputs["template"]["getAll"][number];
 
@@ -44,8 +39,8 @@ export default function Page() {
               <tr key={template.id}>
                 <td>{template.name}</td>
                 <td>{template.changedBy.email}</td>
-                <td>{formatDate(template.createdAt)}</td>
-                <td>{formatDate(template.updatedAt)}</td>
+                <td>{formatDateToMedium(template.createdAt)}</td>
+                <td>{formatDateToMedium(template.updatedAt)}</td>
                 <td className="w-12">
                   <OptionsMenu
                     template={template}
@@ -64,7 +59,7 @@ export default function Page() {
             setTemplate(null);
             setIsOpen(true);
           }}
-          className="btn btn-sm mx-auto mt-5 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
+          className="btn btn-sm mx-auto mt-2 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <DocumentPlusIcon className="h-5 w-5" />
         </button>
@@ -105,7 +100,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   return (
     <>
       <Menu as="div" className="relative">
-        <Menu.Button className="text-accent hover:text-accent-focus ui-open:text-accent-focus">
+        <Menu.Button className="btn btn-square btn-ghost btn-sm text-accent hover:bg-opacity-0 hover:text-accent-focus ui-open:text-accent-focus">
           <Cog6ToothIcon className="h-5 w-5" />
         </Menu.Button>
         <Menu.Items

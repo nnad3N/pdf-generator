@@ -53,16 +53,18 @@ const TemplateVariables = () => {
                   <option value="date">Date</option>
                 </select>
               </td>
-              <td className="w-14 px-0">
-                <button
-                  type="button"
-                  onClick={() => remove(index)}
-                  className={`btn btn-ghost ${
-                    fields.length === 1 ? "btn-disabled" : "text-red-500"
-                  }`}
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
+              <td className="px-0">
+                <div className="flex h-12 items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => remove(index)}
+                    className={`btn btn-square btn-ghost btn-sm hover:bg-opacity-0 hover:text-red-600 ${
+                      fields.length === 1 ? "btn-disabled" : "text-red-500"
+                    }`}
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -78,7 +80,7 @@ const TemplateVariables = () => {
               type: "text",
             })
           }
-          className="btn btn-ghost text-accent"
+          className="btn btn-ghost btn-sm my-2 text-accent"
         >
           NEW VARIABLE
           <PlusIcon className="h-5 w-5" />

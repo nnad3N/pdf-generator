@@ -1,23 +1,8 @@
-import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { pdfSchema } from "@/utils/schemas";
 import puppeteer from "puppeteer";
 
 export const pdfRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(({ ctx }) => {
-    return ctx.prisma.pdf.findMany({
-      select: {
-        id: true,
-        filename: true,
-        createdBy: {
-          select: {
-            email: true,
-          },
-        },
-        createdAt: true,
-      },
-    });
-  }),
   getTemplates: protectedProcedure.query(({ ctx }) => {
     return ctx.prisma.template.findMany({
       select: {
@@ -81,40 +66,5 @@ export const pdfRouter = createTRPCRouter({
         filename: input.filename,
         file: Buffer.from(pdf).toString("base64"),
       };
-    }),
-  download: protectedProcedure
-    .input(
-      z.object({
-        pdfId: z.string().uuid(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      const { file, filename } = await ctx.prisma.pdf.findUniqueOrThrow({
-        where: {
-          id: input.pdfId,
-        },
-        select: {
-          filename: true,
-          file: true,
-        },
-      });
-
-      return {
-        filename,
-        file: Buffer.from(file).toString("base64"),
-      };
-    }),
-  delete: protectedProcedure
-    .input(
-      z.object({
-        pdfId: z.string().uuid(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.pdf.delete({
-        where: {
-          id: input.pdfId,
-        },
-      });
     }),
 });

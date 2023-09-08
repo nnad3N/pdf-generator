@@ -65,7 +65,7 @@ export default function Page() {
             setUser(null);
             setIsOpen(true);
           }}
-          className="btn btn-sm mx-auto mt-5 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
+          className="btn btn-sm mx-auto mt-4 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
         </button>

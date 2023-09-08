@@ -13,6 +13,7 @@ const saveFile = ({ file, filename }: SaveFile) => {
   link.download = filename;
   link.click();
   link.remove();
+  URL.revokeObjectURL(url);
 };
 
 export default saveFile;
