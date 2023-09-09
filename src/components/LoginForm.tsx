@@ -8,6 +8,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { loginAction } from "@/app/actions";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Button from "@/components/buttons/Button";
 
 const LoginForm = () => {
   const [formError, setFormError] = useState<string | undefined>(undefined);
@@ -69,9 +70,9 @@ const LoginForm = () => {
         {...register("password")}
         error={errors.password}
       />
-      <button type="submit" className="btn btn-primary mt-4 w-full">
+      <Button type="submit" className="mt-4">
         Login
-      </button>
+      </Button>
     </form>
   );
 };
