@@ -28,3 +28,9 @@ const ModalRoot: React.FC<React.PropsWithChildren<Props>> = ({
 };
 
 export default ModalRoot;
+
+export const ModalControlsWrapper: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
+  return <div className="mt-4 flex justify-between">{children}</div>;
+};

@@ -5,12 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { type TemplateSchema, templateSchema } from "@/utils/schemas";
 import { api } from "@/utils/api";
-import Input from "../form/Input";
 import { type Template } from "@/app/templates/page";
-import ModalRoot from "./ModalRoot";
-import FileInput from "../form/FileInput";
 import fileToBase64 from "@/utils/base64";
-import TemplateVariables from "../TemplateVariables";
+import TemplateVariables from "@/components/TemplateVariables";
+import Button from "@/components/buttons/Button";
+import FileInput from "@/components/form/FileInput";
+import Input from "@/components/form/Input";
+import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
 
 const defaultValues: TemplateSchema = {
   name: "",
@@ -61,7 +62,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
   } = methods;
 
   const utils = api.useContext();
-  const { mutate: upsert } = api.template.upsert.useMutation({
+  const { mutate: upsert, isLoading } = api.template.upsert.useMutation({
     async onSuccess() {
       await Promise.all([
         utils.template.getAll.invalidate(),
@@ -111,14 +112,14 @@ const UpsertTemplateModal: React.FC<Props> = ({
         <FormProvider {...methods}>
           <TemplateVariables />
         </FormProvider>
-        <div className="mt-4 flex justify-between">
-          <button onClick={() => setIsOpen(false)} className="btn btn-outline">
+        <ModalControlsWrapper>
+          <Button onClick={() => setIsOpen(false)} intent="outline">
             Cancel
-          </button>
-          <button disabled={!isDirty} type="submit" className="btn btn-primary">
+          </Button>
+          <Button type="submit" disabled={!isDirty} isLoading={isLoading}>
             {template ? "Update" : "Create"}
-          </button>
-        </div>
+          </Button>
+        </ModalControlsWrapper>
       </Dialog.Panel>
     </ModalRoot>
   );

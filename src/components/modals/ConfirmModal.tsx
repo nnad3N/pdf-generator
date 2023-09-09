@@ -1,50 +1,50 @@
 import { Dialog } from "@headlessui/react";
-import ModalRoot from "./ModalRoot";
+import Button, { type ButtonIntents } from "@/components/buttons/Button";
+import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
 
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   action: () => void;
+  isLoading: boolean;
+  loadingText?: string;
   actionHeader: string;
   actionDescription: string;
   confirmText: string;
-  actionButtonColor: "primary" | "accent" | "danger";
+  actionButtonIntent: ButtonIntents;
 }
 
 const ConfirmModal: React.FC<Props> = ({
   isOpen,
   setIsOpen,
   action,
+  isLoading,
+  loadingText,
   actionHeader,
   actionDescription,
   confirmText,
-  actionButtonColor,
+  actionButtonIntent,
 }) => {
   return (
     <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
-      <Dialog.Panel className="modal-box flex w-96 flex-col gap-y-4">
+      <Dialog.Panel className="modal-box flex w-96 flex-col">
         <div className="text-left">
           <h3 className="mb-1 text-lg font-semibold">{actionHeader}</h3>
           <p>{actionDescription}</p>
         </div>
-        <div className="mt-2 flex justify-between">
-          <button onClick={() => setIsOpen(false)} className="btn btn-outline">
+        <ModalControlsWrapper>
+          <Button onClick={() => setIsOpen(false)} intent="outline">
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={action}
-            type="button"
-            className={`btn ${
-              actionButtonColor === "primary"
-                ? "btn-primary"
-                : actionButtonColor === "accent"
-                ? "btn-accent"
-                : "btn-error"
-            }`}
+            intent={actionButtonIntent}
+            isLoading={isLoading}
+            loadingText={loadingText}
           >
             {confirmText}
-          </button>
-        </div>
+          </Button>
+        </ModalControlsWrapper>
       </Dialog.Panel>
     </ModalRoot>
   );

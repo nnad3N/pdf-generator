@@ -6,9 +6,10 @@ import { useForm } from "react-hook-form";
 import { type UserSchema, userSchema } from "@/utils/schemas";
 import { api } from "@/utils/api";
 import PasswordInput from "@/components/form/PasswordInput";
-import Input from "../form/Input";
 import { type User } from "@/app/admin/page";
-import ModalRoot from "./ModalRoot";
+import Button from "@/components/buttons/Button";
+import Input from "@/components/form/Input";
+import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
 
 const defaultValues: UserSchema = {
   firstName: "",
@@ -47,7 +48,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   });
 
   const utils = api.useContext();
-  const { mutate: upsert } = api.user.upsert.useMutation({
+  const { mutate: upsert, isLoading } = api.user.upsert.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
       setIsOpen(false);
@@ -90,14 +91,14 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
             />
           </label>
         </div>
-        <div className="mt-4 flex justify-between">
-          <button onClick={() => setIsOpen(false)} className="btn btn-outline">
+        <ModalControlsWrapper>
+          <Button onClick={() => setIsOpen(false)} intent="outline">
             Cancel
-          </button>
-          <button disabled={!isDirty} type="submit" className="btn btn-primary">
+          </Button>
+          <Button type="submit" disabled={!isDirty} isLoading={isLoading}>
             {user ? "Update" : "Create"}
-          </button>
-        </div>
+          </Button>
+        </ModalControlsWrapper>
       </Dialog.Panel>
     </ModalRoot>
   );

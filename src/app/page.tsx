@@ -9,6 +9,7 @@ import { Combobox } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 import Input from "@/components/form/Input";
 import saveFile from "@/utils/saveFile";
+import Button from "@/components/buttons/Button";
 
 export type PDFTemplate = RouterOutputs["pdf"]["getTemplates"][number];
 
@@ -75,18 +76,15 @@ export default function Page() {
           {...register("filename")}
           error={errors.filename}
         />
-        <button
-          disabled={!isDirty || isLoading}
-          className="btn btn-primary mt-4"
+        <Button
+          className="mt-4"
+          type="submit"
+          disabled={!isDirty}
+          isLoading={isLoading}
+          loadingText="Generating"
         >
-          {isLoading ? (
-            <>
-              <span className="loading loading-spinner"></span> Generating
-            </>
-          ) : (
-            "Generate PDF"
-          )}
-        </button>
+          Generate PDF
+        </Button>
       </form>
     </div>
   );

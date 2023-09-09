@@ -65,7 +65,7 @@ export default function Page() {
             setUser(null);
             setIsOpen(true);
           }}
-          className="btn btn-sm mx-auto mt-4 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
+          className="btn btn-sm mx-auto mt-2 flex text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
         </button>
@@ -97,7 +97,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
     },
   });
 
-  const { mutate: deleteUser } = api.user.delete.useMutation({
+  const { mutate: deleteUser, isLoading } = api.user.delete.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
     },
@@ -174,10 +174,11 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
         action={() => deleteUser({ userId: user.id })}
+        isLoading={isLoading}
         actionHeader={`Deleting user ${user.email}`}
-        actionDescription={`You are about to delete a user ${user.firstName} ${user.lastName}. This action is permament and cannot be reversed.`}
+        actionDescription={`You are about to delete user ${user.firstName} ${user.lastName}. This action is permament and cannot be reversed.`}
         confirmText="Delete"
-        actionButtonColor="danger"
+        actionButtonIntent="danger"
       />
     </>
   );

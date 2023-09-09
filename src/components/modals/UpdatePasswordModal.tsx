@@ -4,7 +4,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/utils/api";
 import PasswordInput from "../form/PasswordInput";
-import ModalRoot from "./ModalRoot";
+import ModalRoot, { ModalControlsWrapper } from "./ModalRoot";
+import Button from "../buttons/Button";
 
 interface Props {
   isOpen: boolean;
@@ -16,7 +17,7 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<{
     password: string;
   }>({
@@ -30,11 +31,12 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
     shouldUnregister: true,
   });
 
-  const { mutate: updatePassword } = api.user.updatePassword.useMutation({
-    onSuccess() {
-      setIsOpen(false);
-    },
-  });
+  const { mutate: updatePassword, isLoading } =
+    api.user.updatePassword.useMutation({
+      onSuccess() {
+        setIsOpen(false);
+      },
+    });
 
   return (
     <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -50,14 +52,14 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
           {...register("password")}
           error={errors.password}
         />
-        <div className="mt-4 flex justify-between">
-          <button onClick={() => setIsOpen(false)} className="btn btn-outline">
+        <ModalControlsWrapper>
+          <Button onClick={() => setIsOpen(false)} intent="outline">
             Cancel
-          </button>
-          <button type="submit" className="btn btn-primary">
-            Submit
-          </button>
-        </div>
+          </Button>
+          <Button type="submit" disabled={!isDirty} isLoading={isLoading}>
+            Update
+          </Button>
+        </ModalControlsWrapper>
       </Dialog.Panel>
     </ModalRoot>
   );

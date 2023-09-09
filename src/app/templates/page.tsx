@@ -91,11 +91,13 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
     },
   });
 
-  const { mutate: deleteTemplate } = api.template.delete.useMutation({
-    async onSuccess() {
-      await utils.template.getAll.invalidate();
+  const { mutate: deleteTemplate, isLoading } = api.template.delete.useMutation(
+    {
+      async onSuccess() {
+        await utils.template.getAll.invalidate();
+      },
     },
-  });
+  );
 
   return (
     <>
@@ -140,10 +142,11 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
         action={() => deleteTemplate({ templateId: template.id })}
+        isLoading={isLoading}
         actionHeader={`Deleting template ${template.name}`}
         actionDescription={`You are about to delete template ${template.name} with file ${template.filename}. This action is permament and cannot be reversed.`}
         confirmText="Delete"
-        actionButtonColor="danger"
+        actionButtonIntent="danger"
       />
     </>
   );
