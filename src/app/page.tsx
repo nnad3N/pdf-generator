@@ -44,7 +44,7 @@ export default function Page() {
       : undefined,
   });
 
-  const { mutate, isLoading } = api.pdf.create.useMutation({
+  const { mutate: create, isLoading } = api.pdf.create.useMutation({
     onSuccess: saveFile,
   });
 
@@ -57,7 +57,7 @@ export default function Page() {
       />
       <form
         className="mt-2 flex flex-col gap-y-2"
-        onSubmit={handleSubmit((data) => mutate(data))}
+        onSubmit={handleSubmit((data) => create(data))}
       >
         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
           {selectedTemplate?.variables.map(({ id, label, type }, index) => (

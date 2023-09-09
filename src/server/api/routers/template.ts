@@ -33,16 +33,12 @@ export const templateRouter = createTRPCRouter({
     });
   }),
   upsert: protectedProcedure
-    .input(
-      templateSchema.extend({
-        id: z.string().uuid().optional(),
-      }),
-    )
+    .input(templateSchema)
     .mutation(async ({ ctx, input }) => {
-      const template = input.id
+      const template = input.templateId
         ? await ctx.prisma.template.findUnique({
             where: {
-              id: input.id,
+              id: input.templateId,
             },
             select: {
               id: true,
@@ -94,7 +90,7 @@ export const templateRouter = createTRPCRouter({
         await ctx.prisma.$transaction([
           ctx.prisma.template.update({
             where: {
-              id: input.id,
+              id: input.templateId,
             },
             data: {
               name: input.name,

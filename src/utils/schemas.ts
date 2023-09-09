@@ -31,6 +31,7 @@ export const userSchema = z
 export type UserSchema = z.infer<typeof userSchema>;
 
 export const templateSchema = z.object({
+  templateId: z.string().uuid().optional(),
   name: z.string().min(1, { message: "Template name is required." }),
   filename: z
     .string()

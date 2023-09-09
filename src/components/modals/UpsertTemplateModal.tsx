@@ -42,6 +42,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
     defaultValues,
     values: template
       ? {
+          templateId: template.id,
           name: template.name,
           filename: template.filename,
           variables: template.variables,
@@ -94,7 +95,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
     <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
       <Dialog.Panel
         as="form"
-        onSubmit={handleSubmit((data) => upsert({ id: template?.id, ...data }))}
+        onSubmit={handleSubmit((template) => upsert(template))}
         className="modal-box flex max-w-4xl flex-col gap-y-4"
       >
         <Input
