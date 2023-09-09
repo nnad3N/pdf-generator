@@ -1,5 +1,6 @@
 "use client";
 
+import ActionButton from "@/components/buttons/ActionButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
 import { type RouterOutputs, api } from "@/utils/api";
@@ -54,15 +55,14 @@ export default function Page() {
             ))}
           </tbody>
         </table>
-        <button
+        <ActionButton
           onClick={() => {
             setTemplate(null);
             setIsOpen(true);
           }}
-          className="btn btn-sm mx-auto mt-2 flex border-none text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <DocumentPlusIcon className="h-5 w-5" />
-        </button>
+        </ActionButton>
       </div>
       <UpsertTemplateModal
         isOpen={isOpen}

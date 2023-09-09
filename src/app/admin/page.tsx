@@ -1,5 +1,6 @@
 "use client";
 
+import ActionButton from "@/components/buttons/ActionButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
 import UpsertUserModal from "@/components/modals/UpsertUserModal";
@@ -60,15 +61,14 @@ export default function Page() {
             ))}
           </tbody>
         </table>
-        <button
+        <ActionButton
           onClick={() => {
             setUser(null);
             setIsOpen(true);
           }}
-          className="btn btn-sm mx-auto mt-2 flex text-accent hover:bg-transparent hover:text-accent-focus"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
-        </button>
+        </ActionButton>
       </div>
       <UpsertUserModal isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
     </>
