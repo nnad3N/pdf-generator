@@ -37,11 +37,11 @@ export default function Page() {
               <th></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="first:[&_tr]:border-b-0">
             {data.map((user) => (
               <tr
-                className={user.isDeactivated ? "deactivated" : ""}
                 key={user.id}
+                className={user.isDeactivated ? "deactivated" : undefined}
               >
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>

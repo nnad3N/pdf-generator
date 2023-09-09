@@ -25,7 +25,7 @@ export default function Page() {
   return (
     <>
       <div className="rounded-box w-full max-w-3xl bg-base-200 p-5">
-        <table className="table [&_tr]:border-base-100">
+        <table className="table [&_tr]:border-base-100 ">
           <thead>
             <tr>
               <th>TEMPLATE NAME</th>
@@ -35,7 +35,7 @@ export default function Page() {
               <th></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="first:[&_tr]:border-b-0">
             {data.map((template) => (
               <tr key={template.id}>
                 <td>{template.name}</td>

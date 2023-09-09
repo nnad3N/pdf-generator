@@ -6,7 +6,7 @@ const ActionButton: React.FC<
   return (
     <button
       className={cx(
-        "btn btn-ghost btn-sm mx-auto mt-2 flex text-accent hover:bg-transparent hover:text-accent-focus",
+        "btn btn-ghost btn-sm mx-auto mt-1 flex text-accent hover:bg-transparent hover:text-accent-focus",
         className,
       )}
       {...props}
