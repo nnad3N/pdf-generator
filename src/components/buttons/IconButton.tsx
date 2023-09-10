@@ -2,34 +2,37 @@ import { Menu } from "@headlessui/react";
 import { type VariantProps, cva } from "class-variance-authority";
 import { forwardRef } from "react";
 
-const iconButton = cva("btn btn-square btn-ghost btn-sm hover:bg-opacity-0", {
-  variants: {
-    intent: {
-      accent: "text-accent hover:text-accent-focus",
-      danger: "hover:text-red-600 text-red-500",
+const iconButton = cva(
+  "btn btn-square btn-ghost btn-sm !bg-transparent hover:bg-transparent",
+  {
+    variants: {
+      intent: {
+        accent: "text-accent hover:text-accent-focus",
+        danger: "hover:text-red-600 text-red-500",
+      },
+      variant: {
+        standalone: "",
+        menu: "",
+      },
     },
-    variant: {
-      standalone: "",
-      menu: "",
-    },
-  },
-  compoundVariants: [
-    {
+    compoundVariants: [
+      {
+        intent: "accent",
+        variant: "menu",
+        className: "ui-open:text-accent-focus",
+      },
+      {
+        intent: "danger",
+        variant: "menu",
+        className: "ui-open:text-red-600",
+      },
+    ],
+    defaultVariants: {
       intent: "accent",
       variant: "menu",
-      className: "ui-open:text-accent-focus",
     },
-    {
-      intent: "danger",
-      variant: "menu",
-      className: "ui-open:text-red-600",
-    },
-  ],
-  defaultVariants: {
-    intent: "accent",
-    variant: "menu",
   },
-});
+);
 
 interface Props
   extends React.ComponentProps<"button">,

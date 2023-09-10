@@ -3,6 +3,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import Input from "./form/Input";
 import { type TemplateSchema } from "@/utils/schemas";
 import IconButton from "@/components/buttons/IconButton";
+import ActionButton from "@/components/buttons/ActionButton";
 
 const TemplateVariables = () => {
   const {
@@ -71,8 +72,7 @@ const TemplateVariables = () => {
         </tbody>
       </table>
       <div className="flex justify-center">
-        <button
-          type="button"
+        <ActionButton
           onClick={() =>
             append({
               label: "",
@@ -80,11 +80,11 @@ const TemplateVariables = () => {
               type: "text",
             })
           }
-          className="btn btn-ghost btn-sm my-2 text-accent"
+          className="my-2"
         >
           NEW VARIABLE
           <PlusIcon className="h-5 w-5" />
-        </button>
+        </ActionButton>
       </div>
     </div>
   );

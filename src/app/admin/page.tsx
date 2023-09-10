@@ -67,6 +67,7 @@ export default function Page() {
             setUser(null);
             setIsOpen(true);
           }}
+          className="mt-1"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
         </ActionButton>

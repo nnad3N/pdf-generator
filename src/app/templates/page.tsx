@@ -61,6 +61,7 @@ export default function Page() {
             setTemplate(null);
             setIsOpen(true);
           }}
+          className="mt-1"
         >
           Add new <DocumentPlusIcon className="h-5 w-5" />
         </ActionButton>

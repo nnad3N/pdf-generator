@@ -6,7 +6,7 @@ const Table: React.FC<
   return (
     <table
       className={cx(
-        "table [&_tbody>tr:last-child]:border-b-0 [&_tr]:border-base-100",
+        "table [&_tbody>tr:last-child]:border-b-0 [&_tr]:border-neutral-content dark:[&_tr]:border-base-100",
         className,
       )}
       {...props}
