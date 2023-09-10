@@ -1,5 +1,6 @@
 "use client";
 
+import Table from "@/components/Table";
 import ActionButton from "@/components/buttons/ActionButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
@@ -27,7 +28,7 @@ export default function Page() {
   return (
     <>
       <div className="rounded-box w-full max-w-3xl bg-base-200 p-5">
-        <table className="table [&_tr]:border-base-100">
+        <Table>
           <thead>
             <tr>
               <th>FIRST NAME</th>
@@ -37,7 +38,7 @@ export default function Page() {
               <th></th>
             </tr>
           </thead>
-          <tbody className="first:[&_tr]:border-b-0">
+          <tbody>
             {data.map((user) => (
               <tr
                 key={user.id}
@@ -60,7 +61,7 @@ export default function Page() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
         <ActionButton
           onClick={() => {
             setUser(null);

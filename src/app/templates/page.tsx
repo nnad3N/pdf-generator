@@ -1,5 +1,6 @@
 "use client";
 
+import Table from "@/components/Table";
 import ActionButton from "@/components/buttons/ActionButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
@@ -25,7 +26,7 @@ export default function Page() {
   return (
     <>
       <div className="rounded-box w-full max-w-3xl bg-base-200 p-5">
-        <table className="table [&_tr]:border-base-100 ">
+        <Table>
           <thead>
             <tr>
               <th>TEMPLATE NAME</th>
@@ -35,7 +36,7 @@ export default function Page() {
               <th></th>
             </tr>
           </thead>
-          <tbody className="first:[&_tr]:border-b-0">
+          <tbody>
             {data.map((template) => (
               <tr key={template.id}>
                 <td>{template.name}</td>
@@ -54,7 +55,7 @@ export default function Page() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
         <ActionButton
           onClick={() => {
             setTemplate(null);
