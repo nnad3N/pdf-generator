@@ -89,11 +89,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
   };
 
   return (
-    <nav
-      className={`flex h-full justify-between gap-y-3 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3 ${
-        isNavOpen ? "w-64" : "w-max"
-      } flex-col bg-base-200 p-5`}
-    >
+    <nav className="flex h-full flex-col justify-between gap-y-3 bg-base-200 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3">
       <div>
         <button onClick={handleToggleNav} className="btn btn-square btn-ghost">
           <Bars3Icon className="h-7 w-7" />
@@ -132,7 +128,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
 
 export default Navigation;
 
-interface BaseNavButtonProps<T extends "link" | "button" | "menu-button"> {
+interface BaseNavButtonProps<T extends "link" | "button" | "menu"> {
   variant: T;
   isNavOpen: boolean;
 }
@@ -149,7 +145,7 @@ interface ButtonNavButtonProps extends BaseNavButtonProps<"button"> {
 type NavButtonProps =
   | LinkNavButtonProps
   | ButtonNavButtonProps
-  | BaseNavButtonProps<"menu-button">;
+  | BaseNavButtonProps<"menu">;
 
 const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
   props,
@@ -169,7 +165,7 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
       return (
         <Link
           className={`btn ${isActive ? "btn-neutral" : "btn-ghost"} ${
-            props.isNavOpen ? "btn-block justify-start gap-x-5" : "btn-square"
+            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
           }`}
           href={props.href}
         >
@@ -186,18 +182,18 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
       return (
         <button
           className={`btn btn-ghost ${
-            props.isNavOpen ? "btn-block justify-start gap-x-5" : "btn-square"
+            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
           }`}
           onClick={props.onClick}
         >
           {dynamicChildren}
         </button>
       );
-    case "menu-button":
+    case "menu":
       return (
         <Menu.Button
           className={`btn btn-ghost ${
-            props.isNavOpen ? "btn-block justify-start gap-x-5" : "btn-square"
+            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
           }`}
         >
           {dynamicChildren}
@@ -255,7 +251,7 @@ const ThemeControl: React.FC<ThemeControlProps> = ({ isNavOpen }) => {
 
   return (
     <Menu className="relative" as="div">
-      <NavButton variant="menu-button" isNavOpen={isNavOpen}>
+      <NavButton variant="menu" isNavOpen={isNavOpen}>
         {getThemeIcon({ theme: theme as ThemeOptions, size: "base" })} Theme
       </NavButton>
       <Menu.Items
