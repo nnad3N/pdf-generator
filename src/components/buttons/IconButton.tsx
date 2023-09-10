@@ -29,7 +29,7 @@ const iconButton = cva(
     ],
     defaultVariants: {
       intent: "accent",
-      variant: "menu",
+      variant: "standalone",
     },
   },
 );

@@ -1,7 +1,10 @@
 "use client";
 
+import OptionsMenuItems from "@/components/OptionsMenuItems";
 import Table from "@/components/Table";
 import ActionButton from "@/components/buttons/ActionButton";
+import IconButton from "@/components/buttons/IconButton";
+import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
 import UpsertUserModal from "@/components/modals/UpsertUserModal";
@@ -108,64 +111,46 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   return (
     <>
       <Menu as="div" className="relative">
-        <Menu.Button className="text-accent hover:text-accent-focus ui-open:text-accent-focus">
+        <IconButton variant="menu">
           <Cog6ToothIcon className="h-5 w-5" />
-        </Menu.Button>
-        <Menu.Items
-          as="ul"
-          className="menu rounded-box absolute right-0 z-20 mt-2 w-56 origin-top-right bg-base-300 p-2 shadow-md"
-        >
-          <Menu.Item as="li">
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={openEditModal}
-            >
-              <PencilIcon className="h-4 w-4" aria-hidden="true" />
-              Edit
-            </button>
-          </Menu.Item>
-          <Menu.Item as="li">
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => setIsUpdatePasswordModalOpen(true)}
-            >
-              <KeyIcon className="h-4 w-4" aria-hidden="true" />
-              Change Password
-            </button>
-          </Menu.Item>
-          <Menu.Item as="li">
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() =>
-                setIsDeactivated({
-                  userId: user.id,
-                  isDeactivated: !isDeactivated,
-                })
-              }
-            >
-              {isDeactivated ? (
-                <>
-                  <LockOpenIcon className="h-4 w-4" aria-hidden="true" />
-                  Activate
-                </>
-              ) : (
-                <>
-                  <LockClosedIcon className="h-4 w-4" aria-hidden="true" />
-                  Deactivate
-                </>
-              )}
-            </button>
-          </Menu.Item>
-          <Menu.Item as="li">
-            <button
-              className="capitalize text-red-500 hover:text-red-600 ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => setIsConfirmModalOpen(true)}
-            >
-              <TrashIcon className="h-4 w-4" aria-hidden="true" />
-              Delete
-            </button>
-          </Menu.Item>
-        </Menu.Items>
+        </IconButton>
+        <OptionsMenuItems>
+          <MenuButton onClick={openEditModal}>
+            <PencilIcon className="h-4 w-4" />
+            Edit
+          </MenuButton>
+          <MenuButton onClick={() => setIsUpdatePasswordModalOpen(true)}>
+            <KeyIcon className="h-4 w-4" />
+            Change Password
+          </MenuButton>
+          <MenuButton
+            onClick={() =>
+              setIsDeactivated({
+                userId: user.id,
+                isDeactivated: !isDeactivated,
+              })
+            }
+          >
+            {isDeactivated ? (
+              <>
+                <LockOpenIcon className="h-4 w-4" />
+                Activate
+              </>
+            ) : (
+              <>
+                <LockClosedIcon className="h-4 w-4" />
+                Deactivate
+              </>
+            )}
+          </MenuButton>
+          <MenuButton
+            onClick={() => setIsConfirmModalOpen(true)}
+            intent="danger"
+          >
+            <TrashIcon className="h-4 w-4" />
+            Delete
+          </MenuButton>
+        </OptionsMenuItems>
       </Menu>
       <UpdatePasswordModal
         isOpen={isUpdatePasswordModalOpen}

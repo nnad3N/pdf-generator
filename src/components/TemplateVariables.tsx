@@ -61,7 +61,6 @@ const TemplateVariables = () => {
                     onClick={() => remove(index)}
                     disabled={fields.length === 1}
                     intent="danger"
-                    variant="standalone"
                   >
                     <TrashIcon className="h-5 w-5" />
                   </IconButton>

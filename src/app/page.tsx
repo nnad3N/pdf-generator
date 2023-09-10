@@ -126,7 +126,7 @@ const SelectCombobox: React.FC<Props> = ({
             type="button"
             className="btn btn-ghost absolute inset-y-0 right-0 text-accent hover:text-accent-focus focus-visible:text-accent-focus"
           >
-            <ChevronUpDownIcon className="h-5 w-5" aria-hidden="true" />
+            <ChevronUpDownIcon className="h-5 w-5" />
           </Combobox.Button>
         </div>
         <Combobox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-sm bg-base-300 shadow-lg">
@@ -145,7 +145,7 @@ const SelectCombobox: React.FC<Props> = ({
                   {template.name}
                 </span>
                 <span className="absolute inset-y-0 right-0 hidden items-center pr-4 text-accent transition-colors duration-100 ui-selected:flex ui-active:text-base-content">
-                  <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                  <CheckIcon className="h-5 w-5" />
                 </span>
               </Combobox.Option>
             ))

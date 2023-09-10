@@ -1,11 +1,14 @@
 "use client";
 
+import OptionsMenuItems from "@/components/OptionsMenuItems";
 import Table from "@/components/Table";
 import ActionButton from "@/components/buttons/ActionButton";
+import IconButton from "@/components/buttons/IconButton";
+import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
 import { type RouterOutputs, api } from "@/utils/api";
-import { formatDateToMedium } from "@/utils/date";
+import { formatDateAndTime } from "@/utils/date";
 import { Menu } from "@headlessui/react";
 import {
   Cog6ToothIcon,
@@ -41,8 +44,18 @@ export default function Page() {
               <tr key={template.id}>
                 <td>{template.name}</td>
                 <td>{template.changedBy.email}</td>
-                <td>{formatDateToMedium(template.createdAt)}</td>
-                <td>{formatDateToMedium(template.updatedAt)}</td>
+                <td>
+                  {formatDateAndTime(template.createdAt, {
+                    dateStyle: "medium",
+                    timeStyle: "medium",
+                  })}
+                </td>
+                <td>
+                  {formatDateAndTime(template.updatedAt, {
+                    dateStyle: "medium",
+                    timeStyle: "medium",
+                  })}
+                </td>
                 <td className="w-12">
                   <OptionsMenu
                     template={template}
@@ -104,41 +117,28 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   return (
     <>
       <Menu as="div" className="relative">
-        <Menu.Button className="btn btn-square btn-ghost btn-sm text-accent hover:bg-opacity-0 hover:text-accent-focus ui-open:text-accent-focus">
+        <IconButton variant="menu">
           <Cog6ToothIcon className="h-5 w-5" />
-        </Menu.Button>
-        <Menu.Items
-          as="ul"
-          className="menu rounded-box absolute right-0 z-20 mt-2 w-56 origin-top-right bg-base-300 p-2 shadow-md"
-        >
-          <Menu.Item as="li">
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={openEditModal}
-            >
-              <PencilIcon className="h-4 w-4" aria-hidden="true" />
-              Edit
-            </button>
-          </Menu.Item>
-          <Menu.Item as="li">
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => duplicateTemplate({ templateId: template.id })}
-            >
-              <DocumentDuplicateIcon className="h-4 w-4" aria-hidden="true" />
-              Duplicate
-            </button>
-          </Menu.Item>
-          <Menu.Item as="li">
-            <button
-              className="capitalize text-red-500 hover:text-red-600 ui-active:bg-base-content ui-active:bg-opacity-10"
-              onClick={() => setIsConfirmModalOpen(true)}
-            >
-              <TrashIcon className="h-4 w-4" aria-hidden="true" />
-              Delete
-            </button>
-          </Menu.Item>
-        </Menu.Items>
+        </IconButton>
+        <OptionsMenuItems>
+          <MenuButton onClick={openEditModal}>
+            <PencilIcon className="h-4 w-4" />
+            Edit
+          </MenuButton>
+          <MenuButton
+            onClick={() => duplicateTemplate({ templateId: template.id })}
+          >
+            <DocumentDuplicateIcon className="h-4 w-4" />
+            Duplicate
+          </MenuButton>
+          <MenuButton
+            intent="danger"
+            onClick={() => setIsConfirmModalOpen(true)}
+          >
+            <TrashIcon className="h-4 w-4" />
+            Delete
+          </MenuButton>
+        </OptionsMenuItems>
       </Menu>
       <ConfirmModal
         isOpen={isConfirmModalOpen}

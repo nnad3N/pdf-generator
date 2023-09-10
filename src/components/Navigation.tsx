@@ -22,6 +22,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useState, Children, useEffect } from "react";
 import { type User } from "lucia";
+import MenuButton from "@/components/buttons/MenuButton";
 
 interface Props {
   user: User;
@@ -259,21 +260,16 @@ const ThemeControl: React.FC<ThemeControlProps> = ({ isNavOpen }) => {
       </NavButton>
       <Menu.Items
         as="ul"
-        className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-300 p-2 shadow-md"
+        className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-300 p-2 shadow-md focus-visible:outline-none"
       >
         {themeControlButtons.map((control) => (
-          <Menu.Item
-            disabled={theme === control.theme}
-            as="li"
+          <MenuButton
             key={control.theme}
+            disabled={theme === control.theme}
+            onClick={() => setTheme(control.theme)}
           >
-            <button
-              className="capitalize ui-active:bg-base-content ui-active:bg-opacity-10 ui-disabled:pointer-events-none ui-disabled:opacity-25"
-              onClick={() => setTheme(control.theme)}
-            >
-              {control.icon} {control.theme}
-            </button>
-          </Menu.Item>
+            {control.icon} {control.theme}
+          </MenuButton>
         ))}
       </Menu.Items>
     </Menu>
