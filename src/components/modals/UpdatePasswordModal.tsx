@@ -16,6 +16,7 @@ interface Props {
 const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors, isDirty },
   } = useForm<{
@@ -38,8 +39,13 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
       },
     });
 
+  const handleClose = () => {
+    setIsOpen(false);
+    reset();
+  };
+
   return (
-    <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
+    <ModalRoot isOpen={isOpen} onClose={handleClose}>
       <Dialog.Panel
         as="form"
         onSubmit={handleSubmit(({ password }) =>
@@ -53,7 +59,7 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, email }) => {
           error={errors.password}
         />
         <ModalControlsWrapper>
-          <Button onClick={() => setIsOpen(false)} intent="outline">
+          <Button onClick={handleClose} intent="outline">
             Cancel
           </Button>
           <Button type="submit" disabled={!isDirty} isLoading={isLoading}>

@@ -56,8 +56,13 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
     },
   });
 
+  const handleClose = () => {
+    setIsOpen(false);
+    reset();
+  };
+
   return (
-    <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
+    <ModalRoot isOpen={isOpen} onClose={handleClose}>
       <Dialog.Panel
         as="form"
         onSubmit={handleSubmit((data) => upsert(data))}
@@ -92,7 +97,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
           </label>
         </div>
         <ModalControlsWrapper>
-          <Button onClick={() => setIsOpen(false)} intent="outline">
+          <Button onClick={handleClose} intent="outline">
             Cancel
           </Button>
           <Button type="submit" disabled={!isDirty} isLoading={isLoading}>

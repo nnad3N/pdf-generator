@@ -2,6 +2,7 @@ import { TrashIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import Input from "./form/Input";
 import { type TemplateSchema } from "@/utils/schemas";
+import IconButton from "@/components/buttons/IconButton";
 
 const TemplateVariables = () => {
   const {
@@ -55,15 +56,14 @@ const TemplateVariables = () => {
               </td>
               <td className="px-0">
                 <div className="flex h-12 items-center justify-center">
-                  <button
-                    type="button"
+                  <IconButton
                     onClick={() => remove(index)}
-                    className={`btn btn-square btn-ghost btn-sm hover:bg-opacity-0 hover:text-red-600 ${
-                      fields.length === 1 ? "btn-disabled" : "text-red-500"
-                    }`}
+                    disabled={fields.length === 1}
+                    intent="danger"
+                    variant="standalone"
                   >
                     <TrashIcon className="h-5 w-5" />
-                  </button>
+                  </IconButton>
                 </div>
               </td>
             </tr>

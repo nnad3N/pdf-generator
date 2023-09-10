@@ -57,6 +57,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
     setError,
     getValues,
     register,
+    reset,
     handleSubmit,
     formState: { errors, isDirty },
   } = methods;
@@ -92,8 +93,13 @@ const UpsertTemplateModal: React.FC<Props> = ({
     }
   };
 
+  const handleClose = () => {
+    setIsOpen(false);
+    reset();
+  };
+
   return (
-    <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
+    <ModalRoot isOpen={isOpen} onClose={handleClose}>
       <Dialog.Panel
         as="form"
         onSubmit={handleSubmit((template) => upsert(template))}
@@ -113,7 +119,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
           <TemplateVariables />
         </FormProvider>
         <ModalControlsWrapper>
-          <Button onClick={() => setIsOpen(false)} intent="outline">
+          <Button onClick={handleClose} intent="outline">
             Cancel
           </Button>
           <Button type="submit" disabled={!isDirty} isLoading={isLoading}>

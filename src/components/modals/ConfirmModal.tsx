@@ -26,7 +26,7 @@ const ConfirmModal: React.FC<Props> = ({
   actionButtonIntent,
 }) => {
   return (
-    <ModalRoot isOpen={isOpen} setIsOpen={setIsOpen}>
+    <ModalRoot isOpen={isOpen} onClose={setIsOpen}>
       <Dialog.Panel className="modal-box flex w-96 flex-col">
         <div className="text-left">
           <h3 className="mb-1 text-lg font-semibold">{actionHeader}</h3>
