@@ -1,4 +1,8 @@
 export const formatDateAndTime = (
   date: Date,
-  options: Intl.DateTimeFormatOptions,
-) => new Intl.DateTimeFormat("en-GB", options).format(date);
+  style: Intl.DateTimeFormatOptions["dateStyle"],
+) =>
+  new Intl.DateTimeFormat("en-GB", {
+    dateStyle: style,
+    timeStyle: style,
+  }).format(date);

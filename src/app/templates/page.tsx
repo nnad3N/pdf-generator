@@ -44,18 +44,8 @@ export default function Page() {
               <tr key={template.id}>
                 <td>{template.name}</td>
                 <td>{template.changedBy.email}</td>
-                <td>
-                  {formatDateAndTime(template.createdAt, {
-                    dateStyle: "medium",
-                    timeStyle: "medium",
-                  })}
-                </td>
-                <td>
-                  {formatDateAndTime(template.updatedAt, {
-                    dateStyle: "medium",
-                    timeStyle: "medium",
-                  })}
-                </td>
+                <td>{formatDateAndTime(template.createdAt, "medium")}</td>
+                <td>{formatDateAndTime(template.updatedAt, "medium")}</td>
                 <td className="w-12">
                   <OptionsMenu
                     template={template}

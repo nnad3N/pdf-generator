@@ -8,8 +8,25 @@ import { useEffect, useState } from "react";
 import { Combobox } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 import Input from "@/components/form/Input";
-import saveFile from "@/utils/saveFile";
 import Button from "@/components/buttons/Button";
+
+interface SavePDF {
+  filename: string;
+  file: string;
+}
+
+const savePDF = ({ file, filename }: SavePDF) => {
+  const blob = new Blob([Buffer.from(file, "base64")], {
+    type: "application/pdf",
+  });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = filename;
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
 
 export type PDFTemplate = RouterOutputs["pdf"]["getTemplates"][number];
 
@@ -46,7 +63,7 @@ export default function Page() {
   });
 
   const { mutate: create, isLoading } = api.pdf.create.useMutation({
-    onSuccess: saveFile,
+    onSuccess: savePDF,
   });
 
   return (

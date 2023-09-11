@@ -1,5 +1,11 @@
-import { auth } from "@/server/auth";
 import { prisma } from "@/server/db";
+import { lucia } from "lucia";
+import { prisma as prismaAdapter } from "@lucia-auth/adapter-prisma";
+
+const auth = lucia({
+  env: "DEV",
+  adapter: prismaAdapter(prisma),
+});
 
 async function main() {
   const attributes: Lucia.DatabaseUserAttributes = {

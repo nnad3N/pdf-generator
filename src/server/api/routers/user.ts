@@ -23,10 +23,8 @@ export const userRouter = createTRPCRouter({
     const { userId, password, ...attributes } = input;
 
     if (userId) {
-      await Promise.all([
-        ctx.auth.updateUserAttributes(userId, attributes),
-        ctx.auth.invalidateAllUserSessions(userId),
-      ]);
+      await ctx.auth.updateUserAttributes(userId, attributes);
+      await ctx.auth.invalidateAllUserSessions(userId);
     } else {
       if (!password) {
         throw new TRPCError({ code: "BAD_REQUEST" });
@@ -52,13 +50,10 @@ export const userRouter = createTRPCRouter({
           code: "BAD_REQUEST",
         });
       }
-
-      await Promise.all([
-        ctx.auth.updateUserAttributes(input.userId, {
-          isDeactivated: input.isDeactivated,
-        }),
-        ctx.auth.invalidateAllUserSessions(input.userId),
-      ]);
+      await ctx.auth.updateUserAttributes(input.userId, {
+        isDeactivated: input.isDeactivated,
+      });
+      await ctx.auth.invalidateAllUserSessions(input.userId);
     }),
   updatePassword: adminProcedure
     .input(
