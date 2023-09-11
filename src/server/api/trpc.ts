@@ -5,7 +5,7 @@ import { prisma } from "@/server/db";
 import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { cookies } from "next/headers";
 import { env } from "@/env.mjs";
-import { auth } from "../auth";
+import { auth } from "@/server/auth";
 import { type Session } from "lucia";
 
 type CreateContextOptions = {

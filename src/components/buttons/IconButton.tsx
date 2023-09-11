@@ -11,7 +11,6 @@ const iconButton = cva(
         danger: "hover:text-red-600 text-red-500",
       },
       variant: {
-        standalone: "",
         menu: "",
       },
     },
@@ -29,14 +28,11 @@ const iconButton = cva(
     ],
     defaultVariants: {
       intent: "accent",
-      variant: "standalone",
     },
   },
 );
 
-interface Props
-  extends React.ComponentProps<"button">,
-    VariantProps<typeof iconButton> {}
+type Props = React.ComponentProps<"button"> & VariantProps<typeof iconButton>;
 
 const IconButton = forwardRef<
   HTMLButtonElement,

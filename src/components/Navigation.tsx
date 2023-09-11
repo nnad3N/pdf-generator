@@ -23,13 +23,14 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useState, Children, useEffect } from "react";
 import { type User } from "lucia";
 import MenuButton from "@/components/buttons/MenuButton";
+import { cva } from "class-variance-authority";
 
 interface Props {
   user: User;
 }
 
 type Link = {
-  href: "/" | "/pdfs" | "/templates" | "/admin";
+  href: "/" | "/templates" | "/admin";
   label: string;
   icons: {
     active: React.ElementType;
@@ -128,6 +129,22 @@ const Navigation: React.FC<Props> = ({ user }) => {
 
 export default Navigation;
 
+const navButton = cva("btn", {
+  variants: {
+    intent: {
+      button: "btn-ghost",
+    },
+    isNavOpen: {
+      false: "btn-square",
+      true: "w-44 justify-start gap-x-5",
+    },
+    isActive: {
+      false: "bth-ghost",
+      true: "btn-neutral",
+    },
+  },
+});
+
 interface BaseNavButtonProps<T extends "link" | "button" | "menu"> {
   variant: T;
   isNavOpen: boolean;
@@ -164,9 +181,7 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
       );
       return (
         <Link
-          className={`btn ${isActive ? "btn-neutral" : "btn-ghost"} ${
-            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
-          }`}
+          className={navButton({ isActive, isNavOpen: props.isNavOpen })}
           href={props.href}
         >
           {props.isNavOpen ? (
@@ -181,9 +196,10 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "button":
       return (
         <button
-          className={`btn btn-ghost ${
-            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
-          }`}
+          className={navButton({
+            intent: "button",
+            isNavOpen: props.isNavOpen,
+          })}
           onClick={props.onClick}
         >
           {dynamicChildren}
@@ -192,9 +208,10 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "menu":
       return (
         <Menu.Button
-          className={`btn btn-ghost ${
-            props.isNavOpen ? "w-44 justify-start gap-x-5" : "btn-square"
-          }`}
+          className={navButton({
+            intent: "button",
+            isNavOpen: props.isNavOpen,
+          })}
         >
           {dynamicChildren}
         </Menu.Button>

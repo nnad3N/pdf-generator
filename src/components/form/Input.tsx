@@ -1,10 +1,10 @@
 "use client";
 
-import { type InputHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 import { type FieldError } from "react-hook-form";
-import InputError from "./InputError";
+import InputError from "@/components/form/InputError";
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.ComponentProps<"input"> {
   label?: string;
   error?: FieldError;
 }

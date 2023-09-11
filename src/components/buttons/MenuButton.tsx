@@ -6,7 +6,6 @@ const menuButton = cva(
   {
     variants: {
       intent: {
-        default: "",
         danger: "text-red-500 hover:text-red-600 ui-active:text-red-600",
       },
     },

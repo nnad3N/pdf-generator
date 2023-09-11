@@ -1,7 +1,7 @@
 "use client";
 
 import { type FieldError } from "react-hook-form";
-import InputError from "./InputError";
+import InputError from "@/components/form/InputError";
 
 interface Props {
   filename?: string;

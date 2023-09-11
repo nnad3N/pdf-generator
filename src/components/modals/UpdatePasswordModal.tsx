@@ -3,9 +3,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/utils/api";
-import PasswordInput from "../form/PasswordInput";
-import ModalRoot, { ModalControlsWrapper } from "./ModalRoot";
-import Button from "../buttons/Button";
+import PasswordInput from "@/components/form/PasswordInput";
+import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
+import Button from "@/components/buttons/Button";
 
 interface Props {
   isOpen: boolean;

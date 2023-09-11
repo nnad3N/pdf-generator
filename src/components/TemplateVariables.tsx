@@ -1,6 +1,6 @@
 import { TrashIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import Input from "./form/Input";
+import Input from "@/components/form/Input";
 import { type TemplateSchema } from "@/utils/schemas";
 import IconButton from "@/components/buttons/IconButton";
 import ActionButton from "@/components/buttons/ActionButton";

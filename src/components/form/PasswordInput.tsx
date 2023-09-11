@@ -1,11 +1,11 @@
 "use client";
 
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { type InputHTMLAttributes, forwardRef, useState } from "react";
+import { forwardRef, useState } from "react";
 import { type FieldError } from "react-hook-form";
-import InputError from "./InputError";
+import InputError from "@/components/form/InputError";
 
-interface Props extends InputHTMLAttributes<HTMLInputElement> {
+interface Props extends React.ComponentProps<"input"> {
   label: string;
   error?: FieldError;
 }
