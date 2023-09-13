@@ -57,10 +57,13 @@ const LoginForm = () => {
   return (
     <form
       onSubmit={handleSubmit(handleLogin)}
-      className="flex w-96 flex-col gap-y-2 rounded-md bg-base-200 px-9 py-7 shadow-md"
+      className="flex w-96 flex-col gap-y-2 rounded-md bg-base-200 p-6 shadow-md [&_label]:first:pt-0"
     >
       {formError && (
-        <span className="text-center font-semibold text-red-500">
+        <span
+          data-test="login-form-error"
+          className="text-center font-semibold text-red-500"
+        >
           {formError}
         </span>
       )}

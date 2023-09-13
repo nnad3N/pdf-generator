@@ -4,6 +4,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { forwardRef, useState } from "react";
 import { type FieldError } from "react-hook-form";
 import InputError from "@/components/form/InputError";
+import { cx } from "class-variance-authority";
 
 interface Props extends React.ComponentProps<"input"> {
   label: string;
@@ -11,7 +12,7 @@ interface Props extends React.ComponentProps<"input"> {
 }
 
 const PasswordInput = forwardRef<HTMLInputElement, Props>(
-  function PasswordInput({ label, error, className = "", ...rest }, ref) {
+  function PasswordInput({ label, error, className, ...props }, ref) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
     return (
@@ -21,11 +22,13 @@ const PasswordInput = forwardRef<HTMLInputElement, Props>(
         </label>
         <div className="relative">
           <input
-            className={`input input-bordered w-full ${
-              error ? "input-error" : ""
-            } ${className}`}
+            className={cx(
+              "input input-bordered w-full",
+              error && "input-error",
+              className,
+            )}
             ref={ref}
-            {...rest}
+            {...props}
             type={isPasswordVisible ? "text" : "password"}
           />
           <button
@@ -42,7 +45,12 @@ const PasswordInput = forwardRef<HTMLInputElement, Props>(
             )}
           </button>
         </div>
-        {error?.message && <InputError message={error.message} />}
+        {error?.message && (
+          <InputError
+            data-test={`input-error-${props.name}`}
+            message={error.message}
+          />
+        )}
       </div>
     );
   },

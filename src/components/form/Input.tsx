@@ -3,6 +3,7 @@
 import { forwardRef } from "react";
 import { type FieldError } from "react-hook-form";
 import InputError from "@/components/form/InputError";
+import { cx } from "class-variance-authority";
 
 interface Props extends React.ComponentProps<"input"> {
   label?: string;
@@ -10,7 +11,7 @@ interface Props extends React.ComponentProps<"input"> {
 }
 
 const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { label, error, className, ...rest },
+  { label, error, className, ...props },
   ref,
 ) {
   return (
@@ -21,13 +22,20 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         </label>
       )}
       <input
-        className={`input input-bordered ${
-          error ? "input-error" : ""
-        } ${className}`}
+        className={cx(
+          "input input-bordered",
+          error && "input-error",
+          className,
+        )}
         ref={ref}
-        {...rest}
+        {...props}
       />
-      {error?.message && <InputError message={error.message} />}
+      {error?.message && (
+        <InputError
+          data-test={`input-error-${props.name}`}
+          message={error.message}
+        />
+      )}
     </div>
   );
 });

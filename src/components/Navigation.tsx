@@ -112,6 +112,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
       <div>
         <ThemeControl isNavOpen={isNavOpen} />
         <NavButton
+          data-test="logout-button"
           variant="button"
           isNavOpen={isNavOpen}
           onClick={async () => {
@@ -148,6 +149,7 @@ const navButton = cva("btn", {
 interface BaseNavButtonProps<T extends "link" | "button" | "menu"> {
   variant: T;
   isNavOpen: boolean;
+  "data-test"?: string;
 }
 
 interface LinkNavButtonProps extends BaseNavButtonProps<"link"> {
@@ -181,6 +183,7 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
       );
       return (
         <Link
+          {...props}
           className={navButton({ isActive, isNavOpen: props.isNavOpen })}
           href={props.href}
         >
@@ -196,6 +199,7 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "button":
       return (
         <button
+          {...props}
           className={navButton({
             intent: "button",
             isNavOpen: props.isNavOpen,
@@ -208,6 +212,7 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "menu":
       return (
         <Menu.Button
+          {...props}
           className={navButton({
             intent: "button",
             isNavOpen: props.isNavOpen,
