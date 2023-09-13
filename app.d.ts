@@ -9,6 +9,6 @@ declare global {
       Prisma.UserCreateInput,
       keyof Omit<User, "id">
     >;
-    type DatabaseSessionAttributes = Record<string, never> | undefined;
+    type DatabaseSessionAttributes = Record<string, never>;
   }
 }

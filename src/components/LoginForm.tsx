@@ -5,13 +5,15 @@ import PasswordInput from "@/components/form/PasswordInput";
 import { type LoginSchema, loginSchema } from "@/utils/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { loginAction } from "@/app/actions";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/buttons/Button";
+import { useState } from "react";
+
+export const unexpectedErrorString = "An unexpected error occured";
 
 const LoginForm = () => {
-  const [formError, setFormError] = useState<string | undefined>(undefined);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -26,31 +28,37 @@ const LoginForm = () => {
   });
 
   const handleLogin: SubmitHandler<LoginSchema> = async (data) => {
-    setFormError(undefined);
+    setIsLoading(true);
     try {
-      const res = await loginAction(data);
-      switch (res.code) {
-        case "SUCCESS":
-          router.refresh();
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
 
-          break;
-        case "NOT_FOUND":
-        case "FORBIDDEN":
-          setFormError(res.message);
-
-          break;
-        case "UNAUTHORIZED":
-          setError("password", {
-            message: "Bad password. Please try again.",
-          });
-          break;
-
-        default:
-          setFormError("Unexpected error. Please try again later.");
-          break;
+      if (res.status === 200) {
+        router.refresh();
+        return;
       }
-    } catch (error) {
-      console.error(error);
+      const { error } = (await res.json()) as { error: string };
+
+      if (res.status === 401) {
+        setError("password", {
+          message: error,
+        });
+        return;
+      } else if (res.status === 404) {
+        setError("email", {
+          message: error,
+        });
+        return;
+      }
+
+      setFormError(error);
+    } catch (e) {
+      console.error(e);
+      setFormError(unexpectedErrorString);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +81,12 @@ const LoginForm = () => {
         {...register("password")}
         error={errors.password}
       />
-      <Button type="submit" className="mt-4">
+      <Button
+        type="submit"
+        className="mt-4"
+        isLoading={isLoading}
+        loadingText="Logging in"
+      >
         Login
       </Button>
     </form>

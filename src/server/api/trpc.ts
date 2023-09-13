@@ -71,10 +71,9 @@ const enforceIsAdmin = enforceIsAuthed.unstable_pipe(async ({ ctx, next }) => {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  return next({
-    ctx,
-  });
+  return next({ ctx });
 });
 
+export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(enforceIsAuthed);
 export const adminProcedure = t.procedure.use(enforceIsAdmin);

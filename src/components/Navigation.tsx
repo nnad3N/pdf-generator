@@ -1,6 +1,5 @@
 "use client";
 
-import { logoutAction } from "@/app/actions";
 import { Menu } from "@headlessui/react";
 import {
   ArrowLeftOnRectangleIcon,
@@ -82,12 +81,23 @@ const Navigation: React.FC<Props> = ({ user }) => {
     setIsNavOpen(JSON.parse(isNavOpen) as boolean);
   }, []);
 
-  if (!isMounted) return null;
-
   const handleToggleNav = () => {
     setIsNavOpen((isNavOpen) => !isNavOpen);
     localStorage.setItem("isNavOpen", JSON.stringify(!isNavOpen));
   };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+      router.refresh();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  if (!isMounted) return null;
 
   return (
     <nav className="flex h-full flex-col justify-between gap-y-3 bg-base-200 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3">
@@ -115,10 +125,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
           data-test="logout-button"
           variant="button"
           isNavOpen={isNavOpen}
-          onClick={async () => {
-            await logoutAction();
-            router.refresh();
-          }}
+          onClick={handleLogout}
         >
           <ArrowLeftOnRectangleIcon className="h-6 w-6" />
           Logout
@@ -183,9 +190,9 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
       );
       return (
         <Link
-          {...props}
           className={navButton({ isActive, isNavOpen: props.isNavOpen })}
           href={props.href}
+          data-test={props["data-test"]}
         >
           {props.isNavOpen ? (
             <>
@@ -199,12 +206,12 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "button":
       return (
         <button
-          {...props}
           className={navButton({
             intent: "button",
             isNavOpen: props.isNavOpen,
           })}
           onClick={props.onClick}
+          data-test={props["data-test"]}
         >
           {dynamicChildren}
         </button>
@@ -212,11 +219,11 @@ const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
     case "menu":
       return (
         <Menu.Button
-          {...props}
           className={navButton({
             intent: "button",
             isNavOpen: props.isNavOpen,
           })}
+          data-test={props["data-test"]}
         >
           {dynamicChildren}
         </Menu.Button>
