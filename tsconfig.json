@@ -16,6 +16,7 @@
     "jsx": "preserve",
     "incremental": true,
     "noUncheckedIndexedAccess": true,
+    "types": ["cypress", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
@@ -36,5 +37,6 @@
     ".next/types/**/*.ts",
     "prisma/seed.ts"
   ],
+
   "exclude": ["node_modules"]
 }

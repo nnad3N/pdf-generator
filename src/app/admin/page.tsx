@@ -71,6 +71,7 @@ export default function Page() {
             setIsOpen(true);
           }}
           className="mt-1"
+          data-test="add-new-user"
         >
           Add new <UserPlusIcon className="h-5 w-5" />
         </ActionButton>

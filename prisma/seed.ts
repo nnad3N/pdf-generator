@@ -14,8 +14,6 @@ async function main() {
     lastName: "User",
     isAdmin: true,
     isDeactivated: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   };
   const rootPassword = "root";
 
@@ -41,6 +39,23 @@ async function main() {
       rootPassword,
     );
     await auth.updateUserAttributes(userId, attributes);
+  }
+
+  if (process.env.NODE_ENV === "test") {
+    await auth.createUser({
+      key: {
+        providerId: "email",
+        providerUserId: "deactivated@deactivated.com",
+        password: "deactivated",
+      },
+      attributes: {
+        email: "deactivated@deactivated.com",
+        firstName: "Deactivated",
+        lastName: "User",
+        isAdmin: false,
+        isDeactivated: true,
+      },
+    });
   }
 }
 

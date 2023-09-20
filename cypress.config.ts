@@ -12,6 +12,5 @@ export default defineConfig({
       framework: "next",
       bundler: "webpack",
     },
-    supportFile: "cypress/support/component.tsx",
   },
 });

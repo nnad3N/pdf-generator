@@ -19,7 +19,7 @@ import {
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useState, Children, useEffect } from "react";
+import { useState, Children, useEffect } from "react";
 import { type User } from "lucia";
 import MenuButton from "@/components/buttons/MenuButton";
 import { cva } from "class-variance-authority";

@@ -54,7 +54,8 @@ export default Button;
 
 const getDefaultLoadingText = (children: React.ReactNode) => {
   const s = children?.toString();
+
   if (!s) return "Loading";
 
-  return s.endsWith("e") ? s.slice(0, -1) + "ing" : s;
+  return s.endsWith("e") ? s.slice(0, -1) + "ing" : s + "ing";
 };
