@@ -45,7 +45,7 @@ jobs:
         run: pnpm install
 
       - name: Seed the database
-        run: pnpm dlx prisma push && pnpm db:seed
+        run: pnpm dlx prisma db push && pnpm db:seed
 
       - name: Run unit tests
         run: pnpm test:unit
