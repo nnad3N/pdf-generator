@@ -15,20 +15,24 @@ env:
 jobs:
   build-lint-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.4.0
+        uses: pnpm/action-setup@v2
 
-      - name: Setup Node 18
+      - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
 
-      - name: Install deps
+      - name: Install dependencies
         run: pnpm install
 
       - name: Seed the database
@@ -40,5 +44,8 @@ jobs:
       - name: Build, lint and type-check
         run: pnpm build && pnpm lint && pnpm format && pnpm typecheck
 
+      - name: Run start
+        run: pnpm start
+
       - name: Run e2e tests
-        run: pnpm start && pnpm test:e2e
+        run: pnpm test:e2e
