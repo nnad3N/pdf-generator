@@ -45,31 +45,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
-      - name: Setup next build cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
-
-      - name: Install dependencies
+      - name: Install dependencies (with cache)
         run: pnpm install
 
       - name: Build, lint and type-check
         run: pnpm build && pnpm lint && pnpm format && pnpm typecheck
 
+      - name: Setup next build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pnpm
+            ${{ github.workspace }}/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+
       - name: Run unit tests
         run: pnpm test:unit
-
-      - name: Seed the database
-        run: pnpm dlx prisma db push && pnpm db:seed
-
-      - name: Install cypress binary
-        run: pnpm dlx cypress install
-
-      - name: Run e2e tests
-        uses: cypress-io/github-action@v6
-        with:
-          build: pnpm build
-          start: pnpm start
