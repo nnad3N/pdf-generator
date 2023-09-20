@@ -13,7 +13,7 @@ export const env = createEnv({
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
-    NODE_ENV: process.env.NODE_ENV,
+    NODE_ENV: process.env.NODE_ENV ?? "development",
     SITE_URL: process.env.SITE_URL,
     SESSION_COOKIE_NAME: process.env.SESSION_COOKIE_NAME,
   },
