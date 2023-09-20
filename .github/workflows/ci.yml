@@ -51,7 +51,7 @@ jobs:
         run: pnpm test:unit
 
       - name: Build, lint and type-check
-        run: pnpm build lint format typecheck
+        run: pnpm build && pnpm lint && pnpm format && pnpm typecheck
 
       - name: Run e2e tests
         run: pnpm start && pnpm test:e2e
