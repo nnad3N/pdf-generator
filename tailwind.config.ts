@@ -1,4 +1,5 @@
 import { type Config } from "tailwindcss";
+import { type Config as DaisyUIConfig } from "daisyui";
 
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
@@ -11,4 +12,4 @@ export default {
     themes: ["light", "business"],
     darkTheme: "business",
   },
-} satisfies Config;
+} satisfies Config & { daisyui: DaisyUIConfig };
