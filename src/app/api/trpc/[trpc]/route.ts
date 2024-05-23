@@ -1,31 +1,26 @@
-export const runtime = "nodejs";
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { type NextRequest } from "next/server";
 
-import { env } from "@/env.mjs";
+import { env } from "@/env";
 import { appRouter } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
-function setCorsHeaders(res: Response) {
-  res.headers.set("Access-Control-Allow-Origin", "*");
-  res.headers.set("Access-Control-Request-Method", "*");
-  res.headers.set("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
-  res.headers.set("Access-Control-Allow-Headers", "*");
-}
-
-export function OPTIONS() {
-  const response = new Response(null, {
-    status: 204,
+/**
+ * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
+ * handling a HTTP request (e.g. when you make requests from Client Components).
+ */
+const createContext = async (req: NextRequest) => {
+  return createTRPCContext({
+    headers: req.headers,
   });
-  setCorsHeaders(response);
-  return response;
-}
+};
 
-const handler = async (req: Request) => {
-  const response = await fetchRequestHandler({
+const handler = (req: NextRequest) =>
+  fetchRequestHandler({
     endpoint: "/api/trpc",
-    router: appRouter,
     req,
-    createContext: createTRPCContext,
+    router: appRouter,
+    createContext: () => createContext(req),
     onError:
       env.NODE_ENV === "development"
         ? ({ path, error }) => {
@@ -35,10 +30,5 @@ const handler = async (req: Request) => {
           }
         : undefined,
   });
-
-  setCorsHeaders(response);
-
-  return response;
-};
 
 export { handler as GET, handler as POST };

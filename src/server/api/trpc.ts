@@ -2,31 +2,14 @@ import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { prisma } from "@/server/db";
-import { type FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { cookies } from "next/headers";
-import { env } from "@/env.mjs";
 import { auth } from "@/server/auth";
-import { type Session } from "lucia";
+import { cookies as nextCookies } from "next/headers";
 
-type CreateContextOptions = {
-  session: Session | null;
-};
-
-const createInnerTRPCContext = (opts: CreateContextOptions) => {
+export const createTRPCContext = async (opts: { headers: Headers }) => {
   return {
-    session: opts.session,
     prisma,
-    auth,
+    ...opts,
   };
-};
-
-export const createTRPCContext = async (_opts: FetchCreateContextFnOptions) => {
-  const sessionId = cookies().get(env.SESSION_COOKIE_NAME)?.value;
-  const session = sessionId ? await auth.validateSession(sessionId) : null;
-
-  return createInnerTRPCContext({
-    session,
-  });
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -45,35 +28,50 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 
 export const createTRPCRouter = t.router;
 
-const enforceIsAuthed = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.session?.user) {
+const isAuthed = t.middleware(async ({ next, ctx }) => {
+  const cookies = nextCookies();
+  const sessionId = cookies.get(auth.sessionCookieName)?.value;
+
+  const { session, user } = await auth.validateSession(sessionId ?? "");
+
+  if (!session || user.isDeactivated) {
+    const sessionCookie = auth.createBlankSessionCookie();
+    cookies.set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  if (ctx.session.user.isDeactivated) {
-    await auth.invalidateAllUserSessions(ctx.session.user.userId);
-    throw new TRPCError({
-      code: "UNAUTHORIZED",
-      message: "This account is deactivated.",
-    });
+  if (session.fresh) {
+    const sessionCookie = auth.createSessionCookie(session.id);
+    cookies.set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
   }
 
   return next({
     ctx: {
-      // infers the `session` as non-nullable
-      session: ctx.session,
+      ...ctx,
+      user,
     },
   });
 });
-const enforceIsAdmin = enforceIsAuthed.unstable_pipe(async ({ ctx, next }) => {
-  if (ctx.session.user.isAdmin !== true) {
-    await auth.invalidateAllUserSessions(ctx.session.user.userId);
+
+const isAdmin = isAuthed.unstable_pipe(async ({ next, ctx }) => {
+  if (ctx.user.isAdmin === false) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
-  return next({ ctx });
+  return next({
+    ctx,
+  });
 });
 
+export const createCallerFactory = t.createCallerFactory;
 export const publicProcedure = t.procedure;
-export const protectedProcedure = t.procedure.use(enforceIsAuthed);
-export const adminProcedure = t.procedure.use(enforceIsAdmin);
+export const protectedProcedure = t.procedure.use(isAuthed);
+export const adminProcedure = t.procedure.use(isAdmin);

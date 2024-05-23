@@ -11,7 +11,7 @@ import { useState } from "react";
 
 export const unexpectedErrorString = "An unexpected error occured";
 
-const LoginForm = () => {
+const Login = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -93,4 +93,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default Login;

@@ -1,12 +1,12 @@
-import { getPageSession } from "@/server/auth";
+import { getCachedUser } from "@/server/cache";
 import { redirect } from "next/navigation";
 
 export default async function AdminLayout(props: {
   children: React.ReactNode;
 }) {
-  const session = await getPageSession();
+  const user = await getCachedUser();
 
-  if (!session?.user.isAdmin) redirect("/");
+  if (!user?.isAdmin) redirect("/");
 
   return <>{props.children}</>;
 }

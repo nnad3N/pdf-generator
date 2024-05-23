@@ -1,32 +1,31 @@
-import { env } from "@/env.mjs";
-import { lucia } from "lucia";
-import { nextjs } from "lucia/middleware";
-import { prisma } from "@lucia-auth/adapter-prisma";
-import { prisma as client } from "@/server/db";
-import "lucia/polyfill/node";
-import { cache } from "react";
-import { cookies } from "next/headers";
+import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
+import { Lucia } from "lucia";
+import { prisma } from "@/server/db";
+import { env } from "@/env";
+import type { User } from "@prisma/client";
 
-export const auth = lucia({
-  env: env.NODE_ENV === "production" ? "PROD" : "DEV",
-  middleware: nextjs(),
+const adapter = new PrismaAdapter(prisma.session, prisma.user);
+
+export const auth = new Lucia(adapter, {
   sessionCookie: {
-    name: env.SESSION_COOKIE_NAME,
-    expires: false,
+    attributes: {
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+    },
   },
-  getUserAttributes: ({ isAdmin, isDeactivated }) => ({
-    isAdmin,
-    isDeactivated,
-  }),
-  adapter: prisma(client),
+  getUserAttributes: (attributes) => {
+    return {
+      id: attributes.id,
+      email: attributes.email,
+      isDeactivated: attributes.isDeactivated,
+      isAdmin: attributes.isAdmin,
+    };
+  },
 });
 
-export type Auth = typeof auth;
-
-export const getPageSession = cache(() => {
-  const authRequest = auth.handleRequest({
-    request: null,
-    cookies,
-  });
-  return authRequest.validate();
-});
+declare module "lucia" {
+  interface Register {
+    Lucia: typeof auth;
+    DatabaseUserAttributes: User;
+  }
+}
