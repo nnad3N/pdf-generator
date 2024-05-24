@@ -1,5 +1,5 @@
-import fileToBase64 from "@/utils/base64";
-import { formatDateAndTime } from "@/utils/date";
+import fileToBase64 from "@/lib/base64";
+import { formatDateAndTime } from "@/lib/date";
 import { test, expect } from "vitest";
 
 test("getDateAndTime returns correct format", () => {

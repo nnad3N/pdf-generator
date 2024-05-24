@@ -1,6 +1,6 @@
 import { unexpectedErrorString } from "@/components/LoginForm";
 import { auth } from "@/server/auth";
-import { loginSchema } from "@/utils/schemas";
+import { signInSchema } from "@/lib/schemas";
 import { LuciaError } from "lucia";
 import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
@@ -9,7 +9,7 @@ export const POST = async (request: NextRequest) => {
   const body = (await request.json()) as unknown;
 
   try {
-    const result = loginSchema.safeParse(body);
+    const result = signInSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 400 });

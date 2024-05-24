@@ -1,7 +1,7 @@
 import { TrashIcon, PlusIcon } from "@heroicons/react/20/solid";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import Input from "@/components/form/Input";
-import { type TemplateSchema } from "@/utils/schemas";
+import { type TemplateSchema } from "@/lib/schemas";
 import IconButton from "@/components/buttons/IconButton";
 import ActionButton from "@/components/buttons/ActionButton";
 
@@ -18,8 +18,8 @@ const TemplateVariables = () => {
   });
 
   return (
-    <div className="rounded border border-base-content border-opacity-20 px-5 py-2">
-      <table className="table table-sm">
+    <div className="border-base-content rounded border border-opacity-20 px-5 py-2">
+      <table className="table-sm table">
         <thead>
           <tr className="border-none text-center [&_th]:pb-1">
             <th>Label</th>

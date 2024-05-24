@@ -3,7 +3,7 @@
 import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import { type TemplateSchema, templateSchema } from "@/utils/schemas";
+import { type TemplateSchema, templateSchema } from "@/lib/schemas";
 import { api } from "@/utils/api";
 import { type Template } from "@/app/templates/page";
 import fileToBase64 from "@/utils/base64";

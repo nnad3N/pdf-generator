@@ -1,7 +1,14 @@
 import { z } from "zod";
-import { adminProcedure, createTRPCRouter } from "@/server/api/trpc";
-import { userSchema } from "@/utils/schemas";
+import {
+  createTRPCRouter,
+  adminProcedure,
+  publicProcedure,
+  protectedProcedure,
+} from "@/server/api/trpc";
+import { userSchema } from "@/lib/schemas";
 import { TRPCError } from "@trpc/server";
+import bcrypt from "bcrypt";
+import { cookies } from "next/headers";
 
 export const userRouter = createTRPCRouter({
   getAll: adminProcedure.query(({ ctx }) => {
@@ -23,63 +30,135 @@ export const userRouter = createTRPCRouter({
     const { userId, password, ...attributes } = input;
 
     if (userId) {
-      await ctx.auth.updateUserAttributes(userId, attributes);
-      await ctx.auth.invalidateAllUserSessions(userId);
+      await ctx.prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: attributes,
+      });
     } else {
       if (!password) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
-      await ctx.auth.createUser({
-        key: {
-          providerId: "email",
-          providerUserId: attributes.email,
-          password,
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await ctx.prisma.user.create({
+        data: {
+          ...attributes,
+          password: hashedPassword,
         },
-        attributes,
       });
     }
   }),
   toggleActive: adminProcedure
     .input(z.object({ userId: z.string(), isDeactivated: z.boolean() }))
     .mutation(async ({ input, ctx }) => {
-      if (input.userId === ctx.session.user.userId) {
+      if (input.userId === ctx.user.id) {
         throw new TRPCError({
           message:
             "You can't activate/deactivate the same account as the one you are currently using.",
           code: "BAD_REQUEST",
         });
       }
-      await ctx.auth.updateUserAttributes(input.userId, {
-        isDeactivated: input.isDeactivated,
+      await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          isDeactivated: input.isDeactivated,
+        },
       });
-      await ctx.auth.invalidateAllUserSessions(input.userId);
+
+      if (input.isDeactivated) {
+        await ctx.auth.invalidateUserSessions(input.userId);
+      }
     }),
   updatePassword: adminProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        id: z.string(),
         password: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const key = await ctx.auth.updateKeyPassword(
-        "email",
-        input.email,
-        input.password,
-      );
-      await ctx.auth.invalidateAllUserSessions(key.userId);
+      const hashedPassword = await bcrypt.hash(input.password, 10);
+      await ctx.prisma.user.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          password: hashedPassword,
+        },
+      });
+      await ctx.auth.invalidateUserSessions(input.id);
     }),
   delete: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      if (input.userId === ctx.session.user.userId) {
+      if (input.userId === ctx.user.id) {
         throw new TRPCError({
           message:
             "You can't delete the same account as the one you are currently using.",
           code: "BAD_REQUEST",
         });
       }
-      await ctx.auth.deleteUser(input.userId);
+      await ctx.prisma.user.delete({
+        where: {
+          id: input.userId,
+        },
+      });
     }),
+  signIn: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+        password: z.string().min(4),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUnique({
+        where: {
+          email: input.email,
+        },
+        select: {
+          id: true,
+          password: true,
+          isDeactivated: true,
+        },
+      });
+
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (user.isDeactivated) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
+      const isValid = await bcrypt.compare(input.password, user.password);
+
+      if (!isValid) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const [session] = await Promise.all([
+        ctx.auth.createSession(user.id, {}),
+        ctx.auth.deleteExpiredSessions(),
+      ]);
+      const sessionCookie = ctx.auth.createSessionCookie(session.id);
+
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes,
+      );
+    }),
+  signOut: protectedProcedure.mutation(({ ctx }) => {
+    const sessionCookie = ctx.auth.createBlankSessionCookie();
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+  }),
 });

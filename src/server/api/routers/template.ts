@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
-import { type TemplateSchema, templateSchema } from "@/utils/schemas";
+import { type TemplateSchema, templateSchema } from "@/lib/schemas";
 
 type Concrete<Type> = {
   [Property in keyof Type]-?: Type[Property];

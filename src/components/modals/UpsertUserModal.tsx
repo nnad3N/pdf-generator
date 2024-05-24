@@ -3,7 +3,7 @@
 import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { type UserSchema, userSchema } from "@/utils/schemas";
+import { type UserSchema, userSchema } from "@/lib/schemas";
 import { api } from "@/utils/api";
 import PasswordInput from "@/components/form/PasswordInput";
 import { type User } from "@/app/admin/page";

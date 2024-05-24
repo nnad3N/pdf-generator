@@ -2,7 +2,7 @@
 
 import { type RouterOutputs, api } from "@/utils/api";
 import { useForm } from "react-hook-form";
-import { type PDFSchema, pdfSchema } from "@/utils/schemas";
+import { type PDFSchema, pdfSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { Combobox } from "@headlessui/react";
@@ -67,7 +67,7 @@ export default function Page() {
   });
 
   return (
-    <div className="rounded-box w-full max-w-xl bg-base-200 p-5">
+    <div className="rounded-box bg-base-200 w-full max-w-xl p-5">
       <SelectCombobox
         templates={templates}
         selectedTemplate={selectedTemplate}
@@ -141,12 +141,12 @@ const SelectCombobox: React.FC<Props> = ({
           />
           <Combobox.Button
             type="button"
-            className="btn btn-ghost absolute inset-y-0 right-0 text-accent hover:text-accent-focus focus-visible:text-accent-focus"
+            className="btn btn-ghost hover:text-accent-focus focus-visible:text-accent-focus absolute inset-y-0 right-0 text-accent"
           >
             <ChevronUpDownIcon className="h-5 w-5" />
           </Combobox.Button>
         </div>
-        <Combobox.Options className="absolute mt-2 max-h-60 w-full overflow-auto rounded-sm bg-base-300 shadow-lg">
+        <Combobox.Options className="bg-base-300 absolute mt-2 max-h-60 w-full overflow-auto rounded-sm shadow-lg">
           {filteredTemplates?.length === 0 && query !== "" ? (
             <div className="select-none px-4 py-3 text-center">
               Nothing found.
@@ -155,13 +155,13 @@ const SelectCombobox: React.FC<Props> = ({
             filteredTemplates?.map((template) => (
               <Combobox.Option
                 key={template.id}
-                className="relative cursor-pointer select-none px-4 py-2 transition-colors duration-100 ui-active:bg-primary"
+                className="ui-active:bg-primary relative cursor-pointer select-none px-4 py-2 transition-colors duration-100"
                 value={template}
               >
-                <span className="block truncate ui-selected:font-medium">
+                <span className="ui-selected:font-medium block truncate">
                   {template.name}
                 </span>
-                <span className="absolute inset-y-0 right-0 hidden items-center pr-4 text-accent transition-colors duration-100 ui-selected:flex ui-active:text-base-content">
+                <span className="ui-selected:flex ui-active:text-base-content absolute inset-y-0 right-0 hidden items-center pr-4 text-accent transition-colors duration-100">
                   <CheckIcon className="h-5 w-5" />
                 </span>
               </Combobox.Option>

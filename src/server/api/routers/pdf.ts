@@ -1,5 +1,5 @@
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
-import { pdfSchema } from "@/utils/schemas";
+import { pdfSchema } from "@/lib/schemas";
 import puppeteer from "puppeteer";
 
 export const pdfRouter = createTRPCRouter({

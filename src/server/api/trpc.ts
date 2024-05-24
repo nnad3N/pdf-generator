@@ -8,6 +8,7 @@ import { cookies as nextCookies } from "next/headers";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   return {
     prisma,
+    auth,
     ...opts,
   };
 };
