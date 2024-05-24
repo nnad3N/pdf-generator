@@ -1,55 +1,52 @@
 import { prisma } from "@/server/db";
-import { lucia } from "lucia";
-import { prisma as prismaAdapter } from "@lucia-auth/adapter-prisma";
-
-const auth = lucia({
-  env: "DEV",
-  adapter: prismaAdapter(prisma),
-});
+import bcrypt from "bcrypt";
 
 async function main() {
-  const attributes: Lucia.DatabaseUserAttributes = {
-    email: "root@root.com",
-    firstName: "Root",
-    lastName: "User",
-    isAdmin: true,
-    isDeactivated: false,
-  };
-  const rootPassword = "root";
+  const hashedRootPassword = await bcrypt.hash("root", 10);
 
-  const user = await prisma.user.findUnique({
+  await prisma.user.upsert({
     where: {
-      email: attributes.email,
+      email: "root@root.com",
+    },
+    update: {},
+    create: {
+      email: "root@root.com",
+      password: hashedRootPassword,
+      firstName: "Root",
+      lastName: "User",
+      isAdmin: true,
+      isDeactivated: false,
     },
   });
 
-  if (!user) {
-    await auth.createUser({
-      key: {
-        providerId: "email",
-        providerUserId: attributes.email,
-        password: rootPassword,
-      },
-      attributes,
-    });
-  } else {
-    const { userId } = await auth.updateKeyPassword(
-      "email",
-      attributes.email,
-      rootPassword,
-    );
-    await auth.updateUserAttributes(userId, attributes);
-  }
+  const hashedUserPassword = await bcrypt.hash("user", 10);
+
+  await prisma.user.upsert({
+    where: {
+      email: "user@user.com",
+    },
+    update: {},
+    create: {
+      email: "user@user.com",
+      password: hashedUserPassword,
+      firstName: "Normal",
+      lastName: "User",
+      isAdmin: false,
+      isDeactivated: false,
+    },
+  });
 
   if (process.env.NODE_ENV === "test") {
-    await auth.createUser({
-      key: {
-        providerId: "email",
-        providerUserId: "deactivated@deactivated.com",
-        password: "deactivated",
-      },
-      attributes: {
+    const hashedDeactivatedPassword = await bcrypt.hash("deactivated", 10);
+
+    await prisma.user.upsert({
+      where: {
         email: "deactivated@deactivated.com",
+      },
+      update: {},
+      create: {
+        email: "deactivated@deactivated.com",
+        password: hashedDeactivatedPassword,
         firstName: "Deactivated",
         lastName: "User",
         isAdmin: false,
@@ -59,4 +56,12 @@ async function main() {
   }
 }
 
-main().catch((e) => console.error(e));
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
