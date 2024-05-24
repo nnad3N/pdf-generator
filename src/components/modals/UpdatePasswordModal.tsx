@@ -2,7 +2,7 @@ import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 import PasswordInput from "@/components/form/PasswordInput";
 import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
 import Button from "@/components/buttons/Button";

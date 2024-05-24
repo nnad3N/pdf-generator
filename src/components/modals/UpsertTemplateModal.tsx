@@ -4,9 +4,9 @@ import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { type TemplateSchema, templateSchema } from "@/lib/schemas";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 import { type Template } from "@/app/templates/page";
-import fileToBase64 from "@/utils/base64";
+import fileToBase64 from "@/lib/base64";
 import TemplateVariables from "@/components/TemplateVariables";
 import Button from "@/components/buttons/Button";
 import FileInput from "@/components/form/FileInput";
@@ -62,8 +62,8 @@ const UpsertTemplateModal: React.FC<Props> = ({
     formState: { errors, isDirty },
   } = methods;
 
-  const utils = api.useContext();
-  const { mutate: upsert, isLoading } = api.template.upsert.useMutation({
+  const utils = api.useUtils();
+  const { mutate: upsert, isPending } = api.template.upsert.useMutation({
     async onSuccess() {
       await Promise.all([
         utils.template.getAll.invalidate(),
@@ -122,7 +122,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
           <Button onClick={handleClose} intent="outline">
             Cancel
           </Button>
-          <Button type="submit" disabled={!isDirty} isLoading={isLoading}>
+          <Button type="submit" disabled={!isDirty} isLoading={isPending}>
             {template ? "Update" : "Create"}
           </Button>
         </ModalControlsWrapper>

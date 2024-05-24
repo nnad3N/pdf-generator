@@ -7,8 +7,8 @@ import IconButton from "@/components/buttons/IconButton";
 import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
-import { type RouterOutputs, api } from "@/utils/api";
-import { formatDateAndTime } from "@/utils/date";
+import { type RouterOutputs, api } from "@/trpc/react";
+import { formatDateAndTime } from "@/lib/date";
 import { Menu } from "@headlessui/react";
 import {
   Cog6ToothIcon,
@@ -28,7 +28,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="rounded-box w-full max-w-3xl bg-base-200 p-5">
+      <div className="rounded-box bg-base-200 w-full max-w-3xl p-5">
         <Table>
           <thead>
             <tr>
@@ -88,7 +88,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   openEditModal,
 }) => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   const { mutate: duplicateTemplate } = api.template.duplicate.useMutation({
     async onSuccess() {
@@ -96,7 +96,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
     },
   });
 
-  const { mutate: deleteTemplate, isLoading } = api.template.delete.useMutation(
+  const { mutate: deleteTemplate, isPending } = api.template.delete.useMutation(
     {
       async onSuccess() {
         await utils.template.getAll.invalidate();
@@ -134,7 +134,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
         action={() => deleteTemplate({ templateId: template.id })}
-        isLoading={isLoading}
+        isLoading={isPending}
         actionHeader={`Deleting template ${template.name}`}
         actionDescription={`You are about to delete template ${template.name} with file ${template.filename}. This action is permament and cannot be reversed.`}
         confirmText="Delete"

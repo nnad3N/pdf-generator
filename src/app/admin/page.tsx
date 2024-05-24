@@ -8,7 +8,7 @@ import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
 import UpsertUserModal from "@/components/modals/UpsertUserModal";
-import { type RouterOutputs, api } from "@/utils/api";
+import { type RouterOutputs, api } from "@/trpc/react";
 import { Menu } from "@headlessui/react";
 import {
   Cog6ToothIcon,
@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <>
-      <div className="rounded-box w-full max-w-3xl bg-base-200 p-5">
+      <div className="rounded-box bg-base-200 w-full max-w-3xl p-5">
         <Table>
           <thead>
             <tr>
@@ -95,7 +95,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   const [isUpdatePasswordModalOpen, setIsUpdatePasswordModalOpen] =
     useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const utils = api.useContext();
+  const utils = api.useUtils();
 
   const { mutate: setIsDeactivated } = api.user.toggleActive.useMutation({
     async onSuccess() {
@@ -103,7 +103,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
     },
   });
 
-  const { mutate: deleteUser, isLoading } = api.user.delete.useMutation({
+  const { mutate: deleteUser, isPending } = api.user.delete.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
     },
@@ -162,7 +162,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
         action={() => deleteUser({ userId: user.id })}
-        isLoading={isLoading}
+        isLoading={isPending}
         actionHeader={`Deleting user ${user.email}`}
         actionDescription={`You are about to delete user ${user.firstName} ${user.lastName}. This action is permament and cannot be reversed.`}
         confirmText="Delete"

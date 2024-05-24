@@ -1,6 +1,6 @@
 "use client";
 
-import { type RouterOutputs, api } from "@/utils/api";
+import { type RouterOutputs, api } from "@/trpc/react";
 import { useForm } from "react-hook-form";
 import { type PDFSchema, pdfSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";

@@ -4,7 +4,7 @@ import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { type UserSchema, userSchema } from "@/lib/schemas";
-import { api } from "@/utils/api";
+import { api } from "@/trpc/react";
 import PasswordInput from "@/components/form/PasswordInput";
 import { type User } from "@/app/admin/page";
 import Button from "@/components/buttons/Button";
@@ -47,7 +47,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
       : defaultValues,
   });
 
-  const utils = api.useContext();
+  const utils = api.useUtils();
   const { mutate: upsert, isLoading } = api.user.upsert.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
