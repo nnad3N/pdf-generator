@@ -91,7 +91,7 @@ const SignIn = () => {
             </FormItem>
           )}
         />
-        <SignInButton className="mt-1.5" isPending={isPending} />
+        <SignInButton className="mt-2" isPending={isPending} />
       </form>
     </Form>
   );

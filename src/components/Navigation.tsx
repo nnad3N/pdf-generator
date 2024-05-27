@@ -1,134 +1,89 @@
 "use client";
 
-import { Menu } from "@headlessui/react";
 import {
-  ArrowLeftOnRectangleIcon,
-  Bars3Icon,
-  ComputerDesktopIcon,
-  DocumentIcon,
+  LogOutIcon as SignOutIcon,
+  FileTextIcon,
   HomeIcon,
-  KeyIcon,
+  ShieldIcon,
   MoonIcon,
   SunIcon,
-} from "@heroicons/react/24/solid";
-import {
-  DocumentIcon as DocumentIconOutline,
-  HomeIcon as HomeIconOutline,
-  KeyIcon as KeyIconOutline,
-} from "@heroicons/react/24/outline";
+  type LucideProps,
+} from "lucide-react";
+
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState, Children, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { type User } from "lucia";
-import MenuButton from "@/components/buttons/MenuButton";
-import { cva } from "class-variance-authority";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button, type ButtonProps } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { api } from "@/trpc/react";
+import type { MakeRequired } from "@/types";
+import clsx from "clsx";
 
 interface Props {
   user: User;
 }
 
 type Link = {
+  isProtected?: boolean;
   href: "/" | "/templates" | "/admin";
-  label: string;
-  icons: {
-    active: React.ElementType;
-    inactive: React.ElementType;
-  };
+  tooltip: string;
+  IconElement: React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >;
 };
 
 const links: Link[] = [
   {
     href: "/",
-    label: "Dashboard",
-    icons: {
-      active: HomeIcon,
-      inactive: HomeIconOutline,
-    },
+    tooltip: "Dashboard",
+    IconElement: HomeIcon,
   },
   {
     href: "/templates",
-    label: "Templates",
-    icons: {
-      active: DocumentIcon,
-      inactive: DocumentIconOutline,
-    },
+    tooltip: "Templates",
+    IconElement: FileTextIcon,
   },
   {
+    isProtected: true,
     href: "/admin",
-    label: "Admin",
-    icons: {
-      active: KeyIcon,
-      inactive: KeyIconOutline,
-    },
+    tooltip: "Admin",
+    IconElement: ShieldIcon,
   },
 ];
 
 const Navigation: React.FC<Props> = ({ user }) => {
-  const [isMounted, setIsMounted] = useState(false);
-  const [isNavOpen, setIsNavOpen] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    setIsMounted(true);
-    const isNavOpen = localStorage.getItem("isNavOpen");
-
-    if (isNavOpen === null) {
-      localStorage.setItem("isNavOpen", "true");
-      return;
-    }
-
-    setIsNavOpen(JSON.parse(isNavOpen) as boolean);
-  }, []);
-
-  const handleToggleNav = () => {
-    setIsNavOpen((isNavOpen) => !isNavOpen);
-    localStorage.setItem("isNavOpen", JSON.stringify(!isNavOpen));
-  };
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-      router.refresh();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  if (!isMounted) return null;
+  const { mutate: signOut } = api.user.signOut.useMutation({
+    onSuccess() {
+      window.location.reload();
+    },
+  });
 
   return (
-    <nav className="flex h-full flex-col justify-between gap-y-3 bg-base-200 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3">
+    <nav className="flex h-full flex-col justify-between gap-y-3 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3">
       <div>
-        <button onClick={handleToggleNav} className="btn btn-square btn-ghost">
-          <Bars3Icon className="h-7 w-7" />
-        </button>
-        {links.map(({ href, label, icons }) =>
-          href === "/admin" && !user.isAdmin ? null : (
-            <NavButton
-              key={href}
-              variant="link"
-              isNavOpen={isNavOpen}
-              href={href}
-              icons={icons}
-            >
-              {label}
+        {links.map(({ isProtected, href, tooltip, IconElement }) =>
+          isProtected && !user.isAdmin ? null : (
+            <NavButton key={href} as="link" tooltip={tooltip} href={href}>
+              {<IconElement className="h-5 w-5" />}
             </NavButton>
           ),
         )}
       </div>
       <div>
-        <ThemeControl isNavOpen={isNavOpen} />
-        <NavButton
-          data-test="logout-button"
-          variant="button"
-          isNavOpen={isNavOpen}
-          onClick={handleLogout}
-        >
-          <ArrowLeftOnRectangleIcon className="h-6 w-6" />
-          Logout
+        <ThemeToggle />
+        <NavButton as="button" tooltip="Sign out" onClick={() => signOut()}>
+          <SignOutIcon className="h-5 w-5" />
         </NavButton>
       </div>
     </nav>
@@ -137,166 +92,88 @@ const Navigation: React.FC<Props> = ({ user }) => {
 
 export default Navigation;
 
-const navButton = cva("btn", {
-  variants: {
-    intent: {
-      button: "btn-ghost",
-    },
-    isNavOpen: {
-      false: "btn-square",
-      true: "w-44 justify-start gap-x-5",
-    },
-    isActive: {
-      false: "bth-ghost",
-      true: "btn-neutral",
-    },
-  },
-});
-
-interface BaseNavButtonProps<T extends "link" | "button" | "menu"> {
-  variant: T;
-  isNavOpen: boolean;
-  "data-test"?: string;
+interface BaseNavButtonProps<T extends "link" | "button" | "base"> {
+  as: T;
+  tooltip: string;
 }
 
-interface LinkNavButtonProps extends BaseNavButtonProps<"link"> {
-  href: string;
-  icons: Link["icons"];
-}
+type LinkNavButtonProps = MakeRequired<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  "href"
+> &
+  BaseNavButtonProps<"link">;
 
-interface ButtonNavButtonProps extends BaseNavButtonProps<"button"> {
-  onClick: () => void;
-}
+type ButtonNavButtonProps = ButtonProps & BaseNavButtonProps<"button">;
 
-type NavButtonProps =
-  | LinkNavButtonProps
-  | ButtonNavButtonProps
-  | BaseNavButtonProps<"menu">;
+type NavButtonProps = LinkNavButtonProps | ButtonNavButtonProps;
 
-const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = (
-  props,
-) => {
+const NavButton: React.FC<React.PropsWithChildren<NavButtonProps>> = ({
+  children,
+  tooltip,
+  className,
+  ...props
+}) => {
   const pathname = usePathname();
-  const iconChild = Children.toArray(props.children)[0];
-  const dynamicChildren = props.isNavOpen ? props.children : iconChild;
-
-  switch (props.variant) {
-    case "link":
-      const isActive = pathname === props.href;
-      const icon = isActive ? (
-        <props.icons.active className="h-6 w-6" />
-      ) : (
-        <props.icons.inactive className="h-6 w-6" />
-      );
-      return (
-        <Link
-          className={navButton({ isActive, isNavOpen: props.isNavOpen })}
-          href={props.href}
-          data-test={props["data-test"]}
-        >
-          {props.isNavOpen ? (
-            <>
-              {icon} {props.children}
-            </>
-          ) : (
-            icon
-          )}
-        </Link>
-      );
-    case "button":
-      return (
-        <button
-          className={navButton({
-            intent: "button",
-            isNavOpen: props.isNavOpen,
-          })}
-          onClick={props.onClick}
-          data-test={props["data-test"]}
-        >
-          {dynamicChildren}
-        </button>
-      );
-    case "menu":
-      return (
-        <Menu.Button
-          className={navButton({
-            intent: "button",
-            isNavOpen: props.isNavOpen,
-          })}
-          data-test={props["data-test"]}
-        >
-          {dynamicChildren}
-        </Menu.Button>
-      );
-    default:
-      return null;
-  }
-};
-
-type ThemeOptions = "light" | "dark" | "system";
-
-interface GetThemeIcon {
-  theme: ThemeOptions;
-  size?: "small" | "base";
-}
-
-const getThemeIcon = ({ theme, size = "small" }: GetThemeIcon) => {
-  const className = size === "small" ? "h-4 w-4" : "h-6 w-6";
-
-  switch (theme) {
-    case "light":
-      return <SunIcon className={className} />;
-    case "dark":
-      return <MoonIcon className={className} />;
-    case "system":
-      return <ComputerDesktopIcon className={className} />;
-  }
-};
-
-const themeControlButtons: {
-  theme: ThemeOptions;
-  icon: React.ReactNode;
-}[] = [
-  {
-    theme: "light",
-    icon: getThemeIcon({ theme: "light" }),
-  },
-  {
-    theme: "dark",
-    icon: getThemeIcon({ theme: "dark" }),
-  },
-  {
-    theme: "system",
-    icon: getThemeIcon({ theme: "system" }),
-  },
-];
-
-interface ThemeControlProps {
-  isNavOpen: boolean;
-}
-
-const ThemeControl: React.FC<ThemeControlProps> = ({ isNavOpen }) => {
-  const { theme, setTheme } = useTheme();
 
   return (
-    <Menu className="relative" as="div">
-      <NavButton variant="menu" isNavOpen={isNavOpen}>
-        {getThemeIcon({ theme: theme as ThemeOptions, size: "base" })} Theme
-      </NavButton>
-      <Menu.Items
-        as="ul"
-        className="menu rounded-box absolute -top-3 w-44 -translate-y-full bg-base-300 p-2 shadow-md focus-visible:outline-none"
-      >
-        {themeControlButtons.map((control) => (
-          <MenuButton
-            key={control.theme}
-            disabled={theme === control.theme}
-            onClick={() => setTheme(control.theme)}
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {props.as === "button" ? (
+          <Button {...props} className={className} variant="ghost" size="icon">
+            {children}
+          </Button>
+        ) : (
+          <Button
+            className={clsx(pathname === props.href && "bg-muted", className)}
+            variant="ghost"
+            size="icon"
+            asChild
           >
-            {control.icon} {control.theme}
-          </MenuButton>
-        ))}
-      </Menu.Items>
-    </Menu>
+            {/* Set "as" to undefined to prevent BaseNavButtonProps["as"] from changing the href */}
+            <Link {...props} as={undefined}>
+              {children}
+            </Link>
+          </Button>
+        )}
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={5}>
+        {tooltip}
+      </TooltipContent>
+    </Tooltip>
+  );
+};
+
+const ThemeToggle = () => {
+  const { setTheme } = useTheme();
+
+  return (
+    <DropdownMenu>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <SunIcon className="h-5 w-5 dark:hidden" />
+              <MoonIcon className="absolute hidden h-5 w-5 dark:block" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="right" sideOffset={5}>
+          Toggle theme
+        </TooltipContent>
+      </Tooltip>
+
+      <DropdownMenuContent side="top" align="start">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
