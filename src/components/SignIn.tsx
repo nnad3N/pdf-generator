@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import clsx from "clsx";
 
 const SignIn = () => {
@@ -112,7 +112,7 @@ const SignInButton: React.FC<SignInButtonProps> = ({
     <>
       {isPending ? (
         <Button className={clsx("w-full", className)} disabled>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
           Signing in...
         </Button>
       ) : (
