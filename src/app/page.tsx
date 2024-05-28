@@ -1,29 +1,14 @@
 import CreatePDF from "@/app/page.client";
-import { appRouter } from "@/server/api/root";
-import { auth } from "@/server/auth";
-import { prisma } from "@/server/db";
-import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { headers } from "next/headers";
-import SuperJSON from "superjson";
+import { getServerSideHelpers } from "@/trpc/server";
+import Hydrate from "@/components/providers/Hydrate";
 
 export default async function Page() {
-  const helpers = createServerSideHelpers({
-    router: appRouter,
-    ctx: {
-      prisma,
-      auth,
-      headers: headers(),
-    },
-    transformer: SuperJSON,
-  });
-
-  await helpers.pdf.getTemplates.fetch();
-  const dehydratedState = dehydrate(helpers.queryClient);
+  const helpers = await getServerSideHelpers();
+  await helpers.pdf.getTemplates.prefetch();
 
   return (
-    <HydrationBoundary state={dehydratedState}>
+    <Hydrate queryClient={helpers.queryClient}>
       <CreatePDF />
-    </HydrationBoundary>
+    </Hydrate>
   );
 }

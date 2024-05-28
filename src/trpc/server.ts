@@ -13,11 +13,11 @@ import SuperJSON from "superjson";
  * handling a tRPC call from a React Server Component.
  */
 const createContext = cache(() => {
-  const heads = new Headers(headers());
-  heads.set("x-trpc-source", "rsc");
+  const _headers = new Headers(headers());
+  _headers.set("x-trpc-source", "rsc");
 
   return createTRPCContext({
-    headers: heads,
+    headers: _headers,
   });
 });
 

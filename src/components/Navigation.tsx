@@ -82,7 +82,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
       </div>
       <div>
         <ThemeToggle />
-        <NavButton as="button" tooltip="Sign out" onClick={() => signOut()}>
+        <NavButton as="button" tooltip="Sign Out" onClick={() => signOut()}>
           <SignOutIcon className="h-5 w-5" />
         </NavButton>
       </div>
@@ -159,10 +159,9 @@ const ThemeToggle = () => {
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <TooltipContent side="right" sideOffset={5}>
-          Toggle theme
+          Toggle Theme
         </TooltipContent>
       </Tooltip>
-
       <DropdownMenuContent side="top" align="start">
         <DropdownMenuItem onClick={() => setTheme("light")}>
           Light

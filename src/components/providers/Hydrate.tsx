@@ -1,5 +1,6 @@
 import {
   HydrationBoundary,
+  defaultShouldDehydrateQuery,
   dehydrate,
   type QueryClient,
 } from "@tanstack/react-query";
@@ -14,7 +15,13 @@ const Hydrate: React.FC<React.PropsWithChildren<Props>> = ({
   children,
 }) => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
+    <HydrationBoundary
+      state={dehydrate(queryClient, {
+        shouldDehydrateQuery: (query) =>
+          defaultShouldDehydrateQuery(query) ||
+          query.state.status === "pending",
+      })}
+    >
       {children}
     </HydrationBoundary>
   );
