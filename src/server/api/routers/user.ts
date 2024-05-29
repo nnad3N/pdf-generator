@@ -31,6 +31,13 @@ export const userRouter = createTRPCRouter({
     const { userId, password, ...attributes } = input;
 
     if (userId) {
+      if (userId === ctx.user.id && !attributes.isAdmin) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot make your own account a user.",
+        });
+      }
+
       await ctx.prisma.user.update({
         where: {
           id: userId,
@@ -39,7 +46,10 @@ export const userRouter = createTRPCRouter({
       });
     } else {
       if (!password) {
-        throw new TRPCError({ code: "BAD_REQUEST" });
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You need to set the password.",
+        });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -56,8 +66,9 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       if (input.userId === ctx.user.id) {
         throw new TRPCError({
-          message:
-            "You can't activate/deactivate the same account as the one you are currently using.",
+          message: `You cannot ${
+            input.isDeactivated ? "deactivate" : "activate"
+          } your own account.`,
           code: "BAD_REQUEST",
         });
       }
@@ -83,6 +94,7 @@ export const userRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const hashedPassword = await bcrypt.hash(input.password, 10);
+
       await ctx.prisma.user.update({
         where: {
           id: input.userId,
@@ -91,15 +103,17 @@ export const userRouter = createTRPCRouter({
           password: hashedPassword,
         },
       });
-      await ctx.auth.invalidateUserSessions(input.userId);
+
+      if (input.userId !== ctx.user.id) {
+        await ctx.auth.invalidateUserSessions(input.userId);
+      }
     }),
   delete: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ input, ctx }) => {
       if (input.userId === ctx.user.id) {
         throw new TRPCError({
-          message:
-            "You can't delete the same account as the one you are currently using.",
+          message: "You cannot delete your own account.",
           code: "BAD_REQUEST",
         });
       }

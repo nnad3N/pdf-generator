@@ -7,12 +7,17 @@ import { Form } from "@/components/ui/form";
 import { api } from "@/trpc/react";
 import PasswordInput from "@/components/form/PasswordInput";
 import { type User } from "@/app/admin/page.client";
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
-import { DialogClose } from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/form/FormInput";
 import ActionButton from "@/components/ActionButton";
 import CheckboxInput from "@/components/form/CheckboxInput";
+import { toast } from "sonner";
 
 const defaultValues: UserSchema = {
   firstName: "",
@@ -54,20 +59,23 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   const utils = api.useUtils();
   const { mutate: upsert, isPending } = api.user.upsert.useMutation({
     async onSuccess() {
-      await utils.user.getAll.invalidate();
       setIsOpen(false);
-      reset();
+      await utils.user.getAll.invalidate();
+    },
+    onError(error, variables) {
+      if (error.data?.code === "BAD_REQUEST") {
+        toast.warning(error.message);
+      } else {
+        toast.error(
+          `Failed to ${variables.userId ? "edit the" : "create new"} user.`,
+        );
+      }
     },
   });
 
-  const handleClose = () => {
-    setIsOpen(false);
-    reset();
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-96">
+      <DialogContent onCloseAutoFocus={() => reset()} className="max-w-sm">
         <Form {...form}>
           <form
             className="flex flex-col gap-y-4"
@@ -99,9 +107,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
 
             <DialogFooter className="mt-2">
               <DialogClose asChild>
-                <Button onClick={handleClose} variant="outline">
-                  Cancel
-                </Button>
+                <Button variant="outline">Cancel</Button>
               </DialogClose>
               <ActionButton
                 type="submit"

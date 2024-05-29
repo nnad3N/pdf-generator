@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ArrowPathIcon } from "@heroicons/react/20/solid";
+import { RefreshCwIcon } from "lucide-react";
 
 export default function Error({
   error,
@@ -19,7 +19,7 @@ export default function Error({
       <h2 className="mb-4 text-2xl font-semibold">Something went wrong!</h2>
       <button className="btn btn-accent btn-outline" onClick={reset}>
         Reload
-        <ArrowPathIcon className="h-5 w-5" />
+        <RefreshCwIcon className="h-5 w-5" />
       </button>
     </div>
   );

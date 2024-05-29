@@ -20,21 +20,22 @@ import {
 } from "@/components/ui/table";
 import { type RouterOutputs, api } from "@/trpc/react";
 import {
-  Cog6ToothIcon,
-  KeyIcon,
-  LockClosedIcon,
+  SettingsIcon,
+  KeyRoundIcon,
+  LockIcon,
   LockOpenIcon,
   PencilIcon,
   TrashIcon,
   UserPlusIcon,
-} from "@heroicons/react/20/solid";
+} from "lucide-react";
 
 import { useState } from "react";
+import { toast } from "sonner";
 
 export type User = RouterOutputs["user"]["getAll"][number];
 
 const Admin = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isUpsertModalOpen, setIsUpsertModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [users] = api.user.getAll.useSuspenseQuery();
 
@@ -56,22 +57,20 @@ const Admin = () => {
               <TableRow
                 key={user.id}
                 className={
-                  user.isDeactivated
-                    ? "[&_td:not(:last-child)]pointer-events-none [&_td:not(:last-child)]:select-none [&_td:not(:last-child)]:opacity-50"
-                    : ""
+                  user.isDeactivated ? "[&_td:not(:last-child)]:opacity-50" : ""
                 }
               >
                 <TableCell>{user.firstName}</TableCell>
                 <TableCell>{user.lastName}</TableCell>
                 <TableCell>{user.email}</TableCell>
-                <TableCell>{user.isAdmin ? "Admin" : "User"}</TableCell>
+                <TableCell>{user.isAdmin ? "admin" : "user"}</TableCell>
                 <TableCell className="w-12">
                   <OptionsMenu
                     user={user}
                     isDeactivated={user.isDeactivated}
                     openEditModal={() => {
                       setUser(user);
-                      setIsOpen(true);
+                      setIsUpsertModalOpen(true);
                     }}
                   />
                 </TableCell>
@@ -82,7 +81,7 @@ const Admin = () => {
         <Button
           onClick={() => {
             setUser(null);
-            setIsOpen(true);
+            setIsUpsertModalOpen(true);
           }}
           className="mt-1"
           variant="ghost"
@@ -90,7 +89,11 @@ const Admin = () => {
           <UserPlusIcon className="mr-2 h-5 w-5" /> Add New
         </Button>
       </div>
-      <UpsertUserModal isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
+      <UpsertUserModal
+        isOpen={isUpsertModalOpen}
+        setIsOpen={setIsUpsertModalOpen}
+        user={user}
+      />
     </>
   );
 };
@@ -108,14 +111,24 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   isDeactivated,
   openEditModal,
 }) => {
-  const [isUpdatePasswordModalOpen, setIsUpdatePasswordModalOpen] =
-    useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const utils = api.useUtils();
 
   const { mutate: setIsDeactivated } = api.user.toggleActive.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
+    },
+    onError(error, variables) {
+      if (error.data?.code === "BAD_REQUEST") {
+        toast.warning(error.message);
+      } else {
+        toast.error(
+          `Failed to ${
+            variables.isDeactivated ? "deactivate" : "activate"
+          } the user.`,
+        );
+      }
     },
   });
 
@@ -124,6 +137,13 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
       await utils.user.getAll.invalidate();
       setIsConfirmModalOpen(false);
     },
+    onError(error) {
+      if (error.data?.code === "BAD_REQUEST") {
+        toast.warning(error.message);
+      } else {
+        toast.error("Failed to delete the user.");
+      }
+    },
   });
 
   return (
@@ -131,7 +151,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="icon" variant="ghost">
-            <Cog6ToothIcon className="h-5 w-5" />
+            <SettingsIcon className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -139,9 +159,9 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
             <PencilIcon className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsUpdatePasswordModalOpen(true)}>
-            <KeyIcon className="mr-2 h-4 w-4" />
-            Update Password
+          <DropdownMenuItem onClick={() => setIsPasswordModalOpen(true)}>
+            <KeyRoundIcon className="mr-2 h-4 w-4" />
+            Update password
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
@@ -158,7 +178,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
               </>
             ) : (
               <>
-                <LockClosedIcon className="mr-2 h-4 w-4" />
+                <LockIcon className="mr-2 h-4 w-4" />
                 Deactivate
               </>
             )}
@@ -173,8 +193,8 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
       <UpdatePasswordModal
-        isOpen={isUpdatePasswordModalOpen}
-        setIsOpen={setIsUpdatePasswordModalOpen}
+        isOpen={isPasswordModalOpen}
+        setIsOpen={setIsPasswordModalOpen}
         userId={user.id}
       />
       <ConfirmModal

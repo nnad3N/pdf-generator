@@ -2,15 +2,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/trpc/react";
+import { Form } from "@/components/ui/form";
 import PasswordInput from "@/components/form/PasswordInput";
 import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-} from "@/components/ui/alert-dialog";
-import { Form } from "@/components/ui/form";
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 import ActionButton from "@/components/ActionButton";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Props {
   isOpen: boolean;
@@ -18,23 +20,22 @@ interface Props {
   userId: string;
 }
 
+const formSchema = z.object({
+  password: z.string().min(1, "Password is required."),
+});
+
 const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
-  const form = useForm<{
-    password: string;
-  }>({
+  const form = useForm<z.infer<typeof formSchema>>({
     mode: "onSubmit",
     reValidateMode: "onBlur",
-    resolver: zodResolver(
-      z.object({
-        password: z.string().min(1, "Password is required."),
-      }),
-    ),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
     },
   });
 
   const {
+    reset,
     handleSubmit,
     formState: { isDirty },
   } = form;
@@ -44,11 +45,14 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
       onSuccess() {
         setIsOpen(false);
       },
+      onError() {
+        toast.error("Failed to update the password.");
+      },
     });
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent className="modal-box flex w-96 flex-col gap-y-4">
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent onCloseAutoFocus={() => reset()} className="max-w-sm">
         <Form {...form}>
           <form
             onSubmit={handleSubmit(({ password }) =>
@@ -60,9 +64,10 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
               name="password"
               label="New Password"
             />
-
-            <AlertDialogFooter className="mt-4">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
               <ActionButton
                 type="submit"
                 disabled={!isDirty}
@@ -71,11 +76,11 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
               >
                 Update
               </ActionButton>
-            </AlertDialogFooter>
+            </DialogFooter>
           </form>
         </Form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 };
 
