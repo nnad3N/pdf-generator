@@ -97,7 +97,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
               label="Admin"
             />
 
-            <DialogFooter className="mt-2 flex !justify-between">
+            <DialogFooter className="mt-2">
               <DialogClose asChild>
                 <Button onClick={handleClose} variant="outline">
                   Cancel

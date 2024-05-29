@@ -122,6 +122,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   const { mutate: deleteUser, isPending } = api.user.delete.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
+      setIsConfirmModalOpen(false);
     },
   });
 
@@ -179,12 +180,13 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
       <ConfirmModal
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
-        action={() => deleteUser({ userId: user.id })}
-        isLoading={isPending}
-        actionHeader={`Deleting user ${user.email}`}
-        actionDescription={`You are about to delete user ${user.firstName} ${user.lastName}. This action is permament and cannot be reversed.`}
+        onAction={() => deleteUser({ userId: user.id })}
         confirmText="Delete"
-        actionButtonIntent="danger"
+        isPending={isPending}
+        pendingText="Deleting..."
+        actionHeader="Are you absolutely sure?"
+        actionDescription={`You are about to delete user "${user.firstName} ${user.lastName}". This action is permament and cannot be reversed.`}
+        actionButtonVariant="destructive"
       />
     </>
   );
