@@ -141,7 +141,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsUpdatePasswordModalOpen(true)}>
             <KeyIcon className="mr-2 h-4 w-4" />
-            Change Password
+            Update Password
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>
@@ -175,7 +175,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
       <UpdatePasswordModal
         isOpen={isUpdatePasswordModalOpen}
         setIsOpen={setIsUpdatePasswordModalOpen}
-        email={user.email}
+        userId={user.id}
       />
       <ConfirmModal
         isOpen={isConfirmModalOpen}

@@ -77,7 +77,7 @@ export const userRouter = createTRPCRouter({
   updatePassword: adminProcedure
     .input(
       z.object({
-        id: z.string(),
+        userId: z.string(),
         password: z.string(),
       }),
     )
@@ -85,13 +85,13 @@ export const userRouter = createTRPCRouter({
       const hashedPassword = await bcrypt.hash(input.password, 10);
       await ctx.prisma.user.update({
         where: {
-          id: input.id,
+          id: input.userId,
         },
         data: {
           password: hashedPassword,
         },
       });
-      await ctx.auth.invalidateUserSessions(input.id);
+      await ctx.auth.invalidateUserSessions(input.userId);
     }),
   delete: adminProcedure
     .input(z.object({ userId: z.string() }))
