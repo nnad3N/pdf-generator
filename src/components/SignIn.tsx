@@ -6,18 +6,9 @@ import { useForm } from "react-hook-form";
 import { api } from "@/trpc/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Loader2Icon } from "lucide-react";
-import clsx from "clsx";
+import { Form } from "@/components/ui/form";
+import ActionButton from "@/components/ActionButton";
+import FormInput from "@/components/form/FormInput";
 
 const SignIn = () => {
   const router = useRouter();
@@ -65,61 +56,23 @@ const SignIn = () => {
         onSubmit={handleSubmit((data) => signIn(data))}
         className="flex flex-col gap-y-2"
       >
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
+        <FormInput control={form.control} name="email" label="Email" />
+        <FormInput
           control={form.control}
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input {...field} type="password" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          label="Password"
+          type="password"
         />
-        <SignInButton className="mt-2" isPending={isPending} />
+        <ActionButton
+          className="mt-2 w-full"
+          isPending={isPending}
+          pendingText="Signing in..."
+        >
+          Sign In
+        </ActionButton>
       </form>
     </Form>
   );
 };
 
 export default SignIn;
-
-interface SignInButtonProps {
-  className: string;
-  isPending: boolean;
-}
-
-const SignInButton: React.FC<SignInButtonProps> = ({
-  isPending,
-  className,
-}) => {
-  return (
-    <>
-      {isPending ? (
-        <Button className={clsx("w-full", className)} disabled>
-          <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-          Signing in...
-        </Button>
-      ) : (
-        <Button type="submit" className={clsx("w-full", className)}>
-          Sign In
-        </Button>
-      )}
-    </>
-  );
-};

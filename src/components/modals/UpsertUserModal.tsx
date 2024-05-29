@@ -1,15 +1,18 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { type UserSchema, userSchema } from "@/lib/schemas";
+import { useForm } from "react-hook-form";
+import { Form } from "@/components/ui/form";
 import { api } from "@/trpc/react";
 import PasswordInput from "@/components/form/PasswordInput";
-import { type User } from "@/app/admin/page";
-import Button from "@/components/buttons/Button";
-import Input from "@/components/form/Input";
-import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
+import { type User } from "@/app/admin/page.client";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
+import FormInput from "@/components/form/FormInput";
+import ActionButton from "@/components/ActionButton";
+import CheckboxInput from "@/components/form/CheckboxInput";
 
 const defaultValues: UserSchema = {
   firstName: "",
@@ -26,12 +29,7 @@ interface Props {
 }
 
 const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
-  const {
-    register,
-    reset,
-    handleSubmit,
-    formState: { errors, isDirty },
-  } = useForm<UserSchema>({
+  const form = useForm<UserSchema>({
     mode: "onSubmit",
     reValidateMode: "onBlur",
     resolver: zodResolver(userSchema),
@@ -47,8 +45,14 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
       : defaultValues,
   });
 
+  const {
+    reset,
+    handleSubmit,
+    formState: { isDirty },
+  } = form;
+
   const utils = api.useUtils();
-  const { mutate: upsert, isLoading } = api.user.upsert.useMutation({
+  const { mutate: upsert, isPending } = api.user.upsert.useMutation({
     async onSuccess() {
       await utils.user.getAll.invalidate();
       setIsOpen(false);
@@ -62,50 +66,56 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   };
 
   return (
-    <ModalRoot isOpen={isOpen} onClose={handleClose}>
-      <Dialog.Panel
-        as="form"
-        onSubmit={handleSubmit((data) => upsert(data))}
-        className="modal-box flex w-96 flex-col gap-y-2"
-      >
-        <Input
-          label="First Name"
-          {...register("firstName")}
-          error={errors.firstName}
-        />
-        <Input
-          label="Last Name"
-          {...register("lastName")}
-          error={errors.lastName}
-        />
-        <Input label="Email" {...register("email")} error={errors.email} />
-        {!user && (
-          <PasswordInput
-            label="Password"
-            {...register("password")}
-            error={errors.password}
-          />
-        )}
-        <div className="form-control w-max">
-          <label className="label cursor-pointer justify-start gap-x-4">
-            <span className="label-text">Admin account</span>
-            <input
-              {...register("isAdmin")}
-              type="checkbox"
-              className="checkbox-primary checkbox"
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="w-96">
+        <Form {...form}>
+          <form
+            className="flex flex-col gap-y-4"
+            onSubmit={handleSubmit((data) => upsert(data))}
+          >
+            <FormInput
+              control={form.control}
+              name="firstName"
+              label="First Name"
             />
-          </label>
-        </div>
-        <ModalControlsWrapper>
-          <Button onClick={handleClose} intent="outline">
-            Cancel
-          </Button>
-          <Button type="submit" disabled={!isDirty} isLoading={isLoading}>
-            {user ? "Update" : "Create"}
-          </Button>
-        </ModalControlsWrapper>
-      </Dialog.Panel>
-    </ModalRoot>
+            <FormInput
+              control={form.control}
+              name="lastName"
+              label="Last Name"
+            />
+            <FormInput control={form.control} name="email" label="Email" />
+            {!user && (
+              <PasswordInput
+                control={form.control}
+                name="password"
+                label="Password"
+              />
+            )}
+            <CheckboxInput
+              control={form.control}
+              name="isAdmin"
+              label="Admin"
+            />
+
+            <DialogFooter className="mt-2 flex !justify-between">
+              <DialogClose asChild>
+                <Button onClick={handleClose} variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
+              <ActionButton
+                type="submit"
+                disabled={!isDirty}
+                isPending={isPending}
+                pendingText={user ? "Updating..." : "Creating..."}
+              >
+                {user ? "Update" : "Create"}
+              </ActionButton>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -2,7 +2,7 @@
 
 import OptionsMenuItems from "@/components/OptionsMenuItems";
 import Table from "@/components/Table";
-import ActionButton from "@/components/buttons/ActionButton";
+import ActionButton from "@/components/ActionButton";
 import IconButton from "@/components/buttons/IconButton";
 import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";

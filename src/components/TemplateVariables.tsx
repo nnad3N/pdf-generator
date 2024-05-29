@@ -3,7 +3,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import Input from "@/components/form/Input";
 import { type TemplateSchema } from "@/lib/schemas";
 import IconButton from "@/components/buttons/IconButton";
-import ActionButton from "@/components/buttons/ActionButton";
+import ActionButton from "@/components/ActionButton";
 
 const TemplateVariables = () => {
   const {
