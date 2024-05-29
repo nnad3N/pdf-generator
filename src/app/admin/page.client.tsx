@@ -1,15 +1,24 @@
 "use client";
 
-import OptionsMenuItems from "@/components/OptionsMenuItems";
-import Table from "@/components/Table";
-import ActionButton from "@/components/buttons/ActionButton";
-import IconButton from "@/components/buttons/IconButton";
-import MenuButton from "@/components/buttons/MenuButton";
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpdatePasswordModal from "@/components/modals/UpdatePasswordModal";
 import UpsertUserModal from "@/components/modals/UpsertUserModal";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { type RouterOutputs, api } from "@/trpc/react";
-import { Menu } from "@headlessui/react";
 import {
   Cog6ToothIcon,
   KeyIcon,
@@ -19,6 +28,7 @@ import {
   TrashIcon,
   UserPlusIcon,
 } from "@heroicons/react/20/solid";
+
 import { useState } from "react";
 
 export type User = RouterOutputs["user"]["getAll"][number];
@@ -30,28 +40,32 @@ const Admin = () => {
 
   return (
     <>
-      <div className="rounded-box bg-base-200 w-full max-w-3xl p-5">
+      <div className="rounded-box bg-base-200 flex w-full max-w-3xl flex-col items-center p-5">
         <Table>
-          <thead>
-            <tr>
-              <th>FIRST NAME</th>
-              <th>LAST NAME</th>
-              <th>EMAIL</th>
-              <th>ROLE</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
+          <TableHeader>
+            <TableRow>
+              <TableHead>FIRST NAME</TableHead>
+              <TableHead>LAST NAME</TableHead>
+              <TableHead>EMAIL</TableHead>
+              <TableHead>ROLE</TableHead>
+              <TableHead></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map((user) => (
-              <tr
+              <TableRow
                 key={user.id}
-                className={user.isDeactivated ? "deactivated" : undefined}
+                className={
+                  user.isDeactivated
+                    ? "[&_td:not(:last-child)]pointer-events-none [&_td:not(:last-child)]:select-none [&_td:not(:last-child)]:opacity-50"
+                    : ""
+                }
               >
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.email}</td>
-                <td>{user.isAdmin ? "Admin" : "User"}</td>
-                <td className="w-12">
+                <TableCell>{user.firstName}</TableCell>
+                <TableCell>{user.lastName}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.isAdmin ? "Admin" : "User"}</TableCell>
+                <TableCell className="w-12">
                   <OptionsMenu
                     user={user}
                     isDeactivated={user.isDeactivated}
@@ -60,21 +74,21 @@ const Admin = () => {
                       setIsOpen(true);
                     }}
                   />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
+          </TableBody>
         </Table>
-        <ActionButton
+        <Button
           onClick={() => {
             setUser(null);
             setIsOpen(true);
           }}
           className="mt-1"
-          data-test="add-new-user"
+          variant="ghost"
         >
-          Add new <UserPlusIcon className="h-5 w-5" />
-        </ActionButton>
+          <UserPlusIcon className="mr-2 h-5 w-5" /> Add New
+        </Button>
       </div>
       <UpsertUserModal isOpen={isOpen} setIsOpen={setIsOpen} user={user} />
     </>
@@ -113,20 +127,22 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
 
   return (
     <>
-      <Menu as="div" className="relative">
-        <IconButton variant="menu">
-          <Cog6ToothIcon className="h-5 w-5" />
-        </IconButton>
-        <OptionsMenuItems>
-          <MenuButton onClick={openEditModal}>
-            <PencilIcon className="h-4 w-4" />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="icon" variant="ghost">
+            <Cog6ToothIcon className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={openEditModal}>
+            <PencilIcon className="mr-2 h-4 w-4" />
             Edit
-          </MenuButton>
-          <MenuButton onClick={() => setIsUpdatePasswordModalOpen(true)}>
-            <KeyIcon className="h-4 w-4" />
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsUpdatePasswordModalOpen(true)}>
+            <KeyIcon className="mr-2 h-4 w-4" />
             Change Password
-          </MenuButton>
-          <MenuButton
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() =>
               setIsDeactivated({
                 userId: user.id,
@@ -136,25 +152,25 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
           >
             {isDeactivated ? (
               <>
-                <LockOpenIcon className="h-4 w-4" />
+                <LockOpenIcon className="mr-2 h-4 w-4" />
                 Activate
               </>
             ) : (
               <>
-                <LockClosedIcon className="h-4 w-4" />
+                <LockClosedIcon className="mr-2 h-4 w-4" />
                 Deactivate
               </>
             )}
-          </MenuButton>
-          <MenuButton
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => setIsConfirmModalOpen(true)}
-            intent="danger"
+            variant="destructive"
           >
-            <TrashIcon className="h-4 w-4" />
+            <TrashIcon className="mr-2 h-4 w-4 " />
             Delete
-          </MenuButton>
-        </OptionsMenuItems>
-      </Menu>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <UpdatePasswordModal
         isOpen={isUpdatePasswordModalOpen}
         setIsOpen={setIsUpdatePasswordModalOpen}

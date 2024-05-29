@@ -36,24 +36,22 @@ async function main() {
     },
   });
 
-  if (process.env.NODE_ENV === "test") {
-    const hashedDeactivatedPassword = await bcrypt.hash("deactivated", 10);
+  const hashedDeactivatedPassword = await bcrypt.hash("deactivated", 10);
 
-    await prisma.user.upsert({
-      where: {
-        email: "deactivated@deactivated.com",
-      },
-      update: {},
-      create: {
-        email: "deactivated@deactivated.com",
-        password: hashedDeactivatedPassword,
-        firstName: "Deactivated",
-        lastName: "User",
-        isAdmin: false,
-        isDeactivated: true,
-      },
-    });
-  }
+  await prisma.user.upsert({
+    where: {
+      email: "deactivated@deactivated.com",
+    },
+    update: {},
+    create: {
+      email: "deactivated@deactivated.com",
+      password: hashedDeactivatedPassword,
+      firstName: "Deactivated",
+      lastName: "User",
+      isAdmin: false,
+      isDeactivated: true,
+    },
+  });
 }
 
 main()

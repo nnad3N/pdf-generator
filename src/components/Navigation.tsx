@@ -70,7 +70,7 @@ const Navigation: React.FC<Props> = ({ user }) => {
   });
 
   return (
-    <nav className="flex h-full flex-col justify-between gap-y-3 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-3">
+    <nav className="flex h-full flex-col justify-between gap-y-3 p-5 [&_div]:flex [&_div]:flex-col [&_div]:gap-y-1">
       <div>
         {links.map(({ isProtected, href, tooltip, IconElement }) =>
           isProtected && !user.isAdmin ? null : (
