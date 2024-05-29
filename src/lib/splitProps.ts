@@ -2,16 +2,16 @@
 
 type SplitProps<T, K extends (readonly (keyof T)[])[]> = [
   ...{
-    [P in keyof K]: P extends `${number}`
+    [P in keyof K]: P extends string
       ? Pick<T, Extract<K[P], readonly (keyof T)[]>[number]>
       : never;
   },
-  { [P in keyof T as Exclude<P, K[number][number]>]: T[P] } | undefined,
+  { [P in keyof T as Exclude<P, K[number][number]>]: T[P] },
 ];
 
 export function splitProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends Record<any, any>,
+  T extends Record<string, any>,
   K extends (readonly (keyof T)[])[],
 >(props: T, ...keys: K): SplitProps<T, K> {
   const usedKeys: (keyof T)[] = [];
@@ -29,14 +29,13 @@ export function splitProps<
   const rest: Partial<T> = {};
 
   for (const key in props) {
-    if (!usedKeys.some((usedKey) => usedKey === key)) {
+    // == prevents numeric keys from getting duplicated
+    if (!usedKeys.some((usedKey) => usedKey == key)) {
       rest[key] = props[key];
     }
   }
 
-  if (Object.keys(rest).length !== 0) {
-    splitProps.push(rest);
-  }
+  splitProps.push(rest);
 
   return splitProps as SplitProps<T, K>;
 }
