@@ -11,23 +11,32 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { splitProps } from "@/lib/splitProps";
 import type { FieldValues, FieldPath } from "react-hook-form";
 
-interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+interface Props {
   label?: string;
+  placeholder: string;
+  className?: string;
 }
 
-const FormInput = <
+const SelectInput = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
-  props: WithControllerProps<Props, TFieldValues, TName>,
+  props: React.PropsWithChildren<
+    WithControllerProps<Props, TFieldValues, TName>
+  >,
 ) => {
-  const [baseProps, formFieldProps, inputProps] = splitProps(
+  const [baseProps, formFieldProps] = splitProps(
     props,
-    ["label"],
+    ["children", "label", "placeholder", "className"],
     formFieldPropsKeys,
   );
 
@@ -38,7 +47,14 @@ const FormInput = <
         <FormItem>
           {baseProps.label && <FormLabel>{baseProps.label}</FormLabel>}
           <FormControl>
-            <Input {...inputProps} {...field} />
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger className={baseProps.className}>
+                  <SelectValue placeholder={baseProps.placeholder} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>{baseProps.children}</SelectContent>
+            </Select>
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -47,4 +63,4 @@ const FormInput = <
   );
 };
 
-export default FormInput;
+export default SelectInput;

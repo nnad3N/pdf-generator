@@ -1,77 +1,81 @@
-import { TrashIcon, PlusIcon } from "@heroicons/react/20/solid";
+import { Trash2Icon, PlusIcon } from "lucide-react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import Input from "@/components/form/Input";
 import { type TemplateSchema } from "@/lib/schemas";
-import IconButton from "@/components/buttons/IconButton";
-import ActionButton from "@/components/ActionButton";
+import { Button } from "@/components/ui/button";
+
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import FormInput from "@/components/form/FormInput";
+import SelectInput from "@/components/form/SelectInput";
+import { SelectItem } from "@/components/ui/select";
 
 const TemplateVariables = () => {
-  const {
-    control,
-    register,
-    formState: { errors },
-  } = useFormContext<TemplateSchema>();
+  const formContext = useFormContext<TemplateSchema>();
 
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: formContext.control,
     name: "variables",
   });
 
   return (
-    <div className="border-base-content rounded border border-opacity-20 px-5 py-2">
-      <table className="table-sm table">
-        <thead>
-          <tr className="border-none text-center [&_th]:pb-1">
-            <th>Label</th>
-            <th>Variable</th>
-            <th>Type</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
+    <div className="rounded-md border px-3 py-4">
+      <Table>
+        <TableHeader>
+          <TableRow className="border-none [&_th]:h-6 [&_th]:text-center">
+            <TableHead>Label</TableHead>
+            <TableHead>Variable</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead className="w-0"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {fields.map((field, index) => (
-            <tr className="border-none [&_td]:align-top" key={field.id}>
-              <td>
-                <Input
-                  {...register(`variables.${index}.label`)}
+            <TableRow className="border-none [&_td]:align-top" key={field.id}>
+              <TableCell>
+                <FormInput
+                  name={`variables.${index}.label`}
                   placeholder="My Variable"
-                  error={errors?.variables?.[index]?.label}
                 />
-              </td>
-              <td>
-                <Input
-                  {...register(`variables.${index}.name`)}
+              </TableCell>
+              <TableCell>
+                <FormInput
+                  name={`variables.${index}.name`}
                   placeholder="{{my_variable}}"
-                  error={errors?.variables?.[index]?.name}
                 />
-              </td>
-              <td>
-                <select
-                  {...register(`variables.${index}.type`)}
-                  className="select select-bordered w-full"
+              </TableCell>
+              <TableCell>
+                <SelectInput
+                  control={formContext.control}
+                  name={`variables.${index}.type`}
+                  placeholder="Select"
+                  className="min-w-24"
                 >
-                  <option value="text">Text</option>
-                  <option value="number">Number</option>
-                  <option value="date">Date</option>
-                </select>
-              </td>
-              <td className="px-0">
-                <div className="flex h-12 items-center justify-center">
-                  <IconButton
-                    onClick={() => remove(index)}
-                    disabled={fields.length === 1}
-                    intent="danger"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </IconButton>
-                </div>
-              </td>
-            </tr>
+                  <SelectItem value="text">Text</SelectItem>
+                  <SelectItem value="number">Number</SelectItem>
+                  <SelectItem value="date">Date</SelectItem>
+                </SelectInput>
+              </TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => remove(index)}
+                  variant="ghost"
+                  size="icon"
+                >
+                  <Trash2Icon className="h-5 w-5 text-destructive" />
+                </Button>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
       <div className="flex justify-center">
-        <ActionButton
+        <Button
           onClick={() =>
             append({
               label: "",
@@ -79,11 +83,12 @@ const TemplateVariables = () => {
               type: "text",
             })
           }
-          className="my-2"
+          variant="ghost"
+          className="mt-1"
         >
-          NEW VARIABLE
-          <PlusIcon className="h-5 w-5" />
-        </ActionButton>
+          <PlusIcon className="mr-2 h-4 w-4" />
+          New variable
+        </Button>
       </div>
     </div>
   );

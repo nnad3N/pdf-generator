@@ -1,17 +1,23 @@
 "use client";
 
-import { Dialog } from "@headlessui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { type TemplateSchema, templateSchema } from "@/lib/schemas";
 import { api } from "@/trpc/react";
-import { type Template } from "@/app/templates/page";
-import fileToBase64 from "@/lib/base64";
+import { type Template } from "@/app/templates/page.client";
+import { fileToBase64 } from "@/lib/base64";
 import TemplateVariables from "@/components/TemplateVariables";
-import Button from "@/components/buttons/Button";
 import FileInput from "@/components/form/FileInput";
-import Input from "@/components/form/Input";
-import ModalRoot, { ModalControlsWrapper } from "@/components/modals/ModalRoot";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import ActionButton from "@/components/ActionButton";
+import FormInput from "@/components/form/FormInput";
 
 const defaultValues: TemplateSchema = {
   name: "",
@@ -36,8 +42,8 @@ const UpsertTemplateModal: React.FC<Props> = ({
   setIsOpen,
   template,
 }) => {
-  const methods = useForm<TemplateSchema>({
-    mode: "onSubmit",
+  const form = useForm<TemplateSchema>({
+    mode: "onBlur",
     reValidateMode: "onBlur",
     resolver: zodResolver(templateSchema),
     defaultValues,
@@ -56,11 +62,10 @@ const UpsertTemplateModal: React.FC<Props> = ({
     trigger,
     setError,
     getValues,
-    register,
     reset,
     handleSubmit,
     formState: { errors, isDirty },
-  } = methods;
+  } = form;
 
   const utils = api.useUtils();
   const { mutate: upsert, isPending } = api.template.upsert.useMutation({
@@ -93,41 +98,42 @@ const UpsertTemplateModal: React.FC<Props> = ({
     }
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-    reset();
-  };
-
   return (
-    <ModalRoot isOpen={isOpen} onClose={handleClose}>
-      <Dialog.Panel
-        as="form"
-        onSubmit={handleSubmit((template) => upsert(template))}
-        className="modal-box flex max-w-4xl flex-col gap-y-4"
-      >
-        <Input
-          label="Template Name"
-          {...register("name")}
-          error={errors.name}
-        />
-        <FileInput
-          handleFile={handleFile}
-          filename={getValues("filename")}
-          error={errors.filename}
-        />
-        <FormProvider {...methods}>
-          <TemplateVariables />
-        </FormProvider>
-        <ModalControlsWrapper>
-          <Button onClick={handleClose} intent="outline">
-            Cancel
-          </Button>
-          <Button type="submit" disabled={!isDirty} isLoading={isPending}>
-            {template ? "Update" : "Create"}
-          </Button>
-        </ModalControlsWrapper>
-      </Dialog.Panel>
-    </ModalRoot>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent onCloseAutoFocus={() => reset()} className="max-w-4xl">
+        <Form {...form}>
+          <form
+            onSubmit={handleSubmit((template) => upsert(template))}
+            className="flex flex-col gap-y-4"
+          >
+            <FormInput
+              control={form.control}
+              name="name"
+              label="Template Name"
+            />
+            <FileInput
+              handleFile={handleFile}
+              filename={getValues("filename")}
+              error={errors.filename}
+            />
+            <TemplateVariables />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <ActionButton
+                type="submit"
+                disabled={!isDirty}
+                isPending={isPending}
+                pendingText={template ? "Updating..." : "Creating..."}
+              >
+                {template ? "Update" : "Create"}
+              </ActionButton>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
