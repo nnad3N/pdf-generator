@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { api } from "@/trpc/react";
-import type { MakeRequired } from "@/types";
+import type { WithRequired } from "@/lib/types";
 import clsx from "clsx";
 
 interface Props {
@@ -97,7 +97,7 @@ interface BaseNavButtonProps<T extends "link" | "button" | "base"> {
   tooltip: string;
 }
 
-type LinkNavButtonProps = MakeRequired<
+type LinkNavButtonProps = WithRequired<
   React.AnchorHTMLAttributes<HTMLAnchorElement>,
   "href"
 > &

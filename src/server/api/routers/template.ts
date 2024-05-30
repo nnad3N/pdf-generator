@@ -2,10 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, createTRPCRouter } from "@/server/api/trpc";
 import { type TemplateSchema, templateSchema } from "@/lib/schemas";
 
-type Concrete<Type> = {
-  [Property in keyof Type]-?: Type[Property];
-};
-type VariableToUpdate = Concrete<TemplateSchema["variables"][number]>;
+type VariableToUpdate = Required<TemplateSchema["variables"][number]>;
 
 export const templateRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -59,7 +56,7 @@ export const templateRouter = createTRPCRouter({
             name: input.name,
             filename: input.filename,
             file,
-            userId: ctx.session.user.userId,
+            userId: ctx.user.id,
             variables: {
               create: input.variables,
             },
@@ -96,7 +93,7 @@ export const templateRouter = createTRPCRouter({
               name: input.name,
               filename,
               file,
-              userId: ctx.session.user.userId,
+              userId: ctx.user.id,
               variables: {
                 create: variablesToCreate,
                 deleteMany: variablesToDelete,
@@ -145,7 +142,7 @@ export const templateRouter = createTRPCRouter({
           name: `${name} - Copy`,
           filename,
           file,
-          userId: ctx.session.user.userId,
+          userId: ctx.user.id,
           variables: {
             create: variables,
           },

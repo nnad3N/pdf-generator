@@ -41,7 +41,7 @@ const Admin = () => {
 
   return (
     <>
-      <div className="rounded-box bg-base-200 flex w-full max-w-3xl flex-col items-center p-5">
+      <div className="flex w-full max-w-3xl flex-col items-center rounded-lg border px-5 py-4 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -86,7 +86,7 @@ const Admin = () => {
           className="mt-1"
           variant="ghost"
         >
-          <UserPlusIcon className="mr-2 h-5 w-5" /> Add New
+          <UserPlusIcon className="mr-2 h-5 w-5" /> Add new
         </Button>
       </div>
       <UpsertUserModal
@@ -201,7 +201,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
         onAction={() => deleteUser({ userId: user.id })}
-        confirmText="Delete"
+        actionText="Delete"
         isPending={isPending}
         pendingText="Deleting..."
         actionHeader="Are you absolutely sure?"

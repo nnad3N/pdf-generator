@@ -18,7 +18,7 @@ interface Props {
   pendingText: string;
   actionHeader: string;
   actionDescription: string;
-  confirmText: string;
+  actionText: string;
   actionButtonVariant: ButtonVariants;
 }
 
@@ -30,7 +30,7 @@ const ConfirmModal: React.FC<Props> = ({
   pendingText,
   actionHeader,
   actionDescription,
-  confirmText,
+  actionText,
   actionButtonVariant,
 }) => {
   return (
@@ -48,7 +48,7 @@ const ConfirmModal: React.FC<Props> = ({
             pendingText={pendingText}
             variant={actionButtonVariant}
           >
-            {confirmText}
+            {actionText}
           </ActionButton>
         </AlertDialogFooter>
       </AlertDialogContent>
