@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { Combobox } from "@headlessui/react";
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
 import Input from "@/components/form/Input";
-import Button from "@/components/buttons/Button";
+import Button from "@/components/Button";
 
 interface SavePDF {
   filename: string;

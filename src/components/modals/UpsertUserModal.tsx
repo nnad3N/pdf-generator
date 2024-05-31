@@ -57,7 +57,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   } = form;
 
   const utils = api.useUtils();
-  const { mutate: upsert, isPending } = api.user.upsert.useMutation({
+  const { mutate: upsertUser, isPending } = api.user.upsert.useMutation({
     async onSuccess() {
       setIsOpen(false);
       await utils.user.getAll.invalidate();
@@ -79,7 +79,7 @@ const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
         <Form {...form}>
           <form
             className="flex flex-col gap-y-4"
-            onSubmit={handleSubmit((data) => upsert(data))}
+            onSubmit={handleSubmit((user) => upsertUser(user))}
           >
             <FormInput
               control={form.control}

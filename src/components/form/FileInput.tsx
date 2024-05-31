@@ -1,49 +1,75 @@
 "use client";
 
-import { type FieldError } from "react-hook-form";
-import InputError from "@/components/form/InputError";
+import {
+  useFormContext,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form";
+import {
+  FormControl,
+  FormFieldContext,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 
-interface Props {
-  filename?: string;
-  handleFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: FieldError;
+interface Props<TName> {
+  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  name: TName;
 }
 
-const FileInput: React.FC<Props> = ({ filename, handleFile, error }) => {
+const FileInput = <TFieldValues extends FieldValues = FieldValues>({
+  handleFileChange,
+  name,
+}: Props<FieldPath<TFieldValues>>) => {
+  const {
+    setValue,
+    getValues,
+    trigger,
+    formState: { errors },
+  } = useFormContext();
+  const filename = getValues(name);
+
   return (
-    <div className="form-control">
-      <button
-        type="button"
-        className={`focus-visible:outline-offset-3 w-full focus-visible:rounded-sm focus-visible:outline-none ${
-          error ? "focus-visible:outline-error" : "focus-visible:outline-accent"
-        }`}
-      >
+    <FormFieldContext.Provider value={{ name }}>
+      <FormItem>
         <label
-          htmlFor="file"
-          className={`flex h-12 cursor-pointer rounded-sm border ${
-            error ? "border-error" : "border-accent"
-          }`}
+          htmlFor={`${name}-file`}
+          className="group relative flex h-9 w-full cursor-default items-center text-sm"
         >
-          <span
-            className={`flex items-center px-4 text-sm font-medium uppercase ${
-              error ? "bg-error" : "bg-accent text-base-100"
-            }`}
-          >
+          <span className="flex h-full items-center rounded-l-md bg-muted px-3 py-1 font-medium transition-colors group-hover:bg-muted/90">
             Choose file
           </span>
-          <span className="mx-4 my-auto w-56 flex-1 truncate text-left">
-            {!filename ? "No file chosen" : filename}
+          <span
+            aria-label="Filename"
+            className="w-56 flex-1 truncate px-3 py-1 text-left"
+          >
+            {filename || "No file chosen"}
           </span>
-          <input
-            onChange={(e) => handleFile(e)}
-            type="file"
-            id="file"
-            className="hidden"
-          />
+
+          <FormControl>
+            <input
+              onChange={async (e) => {
+                const filename = e.target.files?.[0]?.name;
+                if (!filename) return;
+
+                setValue("filename", filename, { shouldDirty: true });
+                await trigger("filename");
+
+                if (errors[name]) return;
+
+                handleFileChange(e);
+              }}
+              type="file"
+              id={`${name}-file`}
+              // File input text is transparent but is still accessible to screen readers, so we hide the duplicated file name
+              aria-hidden
+              className="absolute inset-0 cursor-pointer rounded-md border border-input text-transparent shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed [&::file-selector-button]:hidden"
+            />
+          </FormControl>
         </label>
-      </button>
-      {error?.message && <InputError message={error.message} />}
-    </div>
+        <FormMessage />
+      </FormItem>
+    </FormFieldContext.Provider>
   );
 };
 

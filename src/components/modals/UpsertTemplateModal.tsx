@@ -18,6 +18,7 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import ActionButton from "@/components/ActionButton";
 import FormInput from "@/components/form/FormInput";
+import { toast } from "sonner";
 
 const defaultValues: TemplateSchema = {
   name: "",
@@ -59,42 +60,47 @@ const UpsertTemplateModal: React.FC<Props> = ({
 
   const {
     setValue,
-    trigger,
     setError,
-    getValues,
     reset,
     handleSubmit,
-    formState: { errors, isDirty },
+    formState: { isDirty },
   } = form;
 
   const utils = api.useUtils();
-  const { mutate: upsert, isPending } = api.template.upsert.useMutation({
-    async onSuccess() {
-      await Promise.all([
-        utils.template.getAll.invalidate(),
-        utils.pdf.getTemplates.invalidate(),
-      ]);
-      setIsOpen(false);
+  const { mutate: upsertTemplate, isPending } = api.template.upsert.useMutation(
+    {
+      async onSuccess() {
+        await Promise.all([
+          utils.template.getAll.invalidate(),
+          utils.pdf.getTemplates.invalidate(),
+        ]);
+        setIsOpen(false);
+      },
+      onError(_error, variables) {
+        toast.error(
+          `Failed to ${variables.templateId ? "update" : "create"} the template.`,
+        );
+      },
     },
-  });
+  );
 
-  const handleFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
 
-    if (file) {
-      const filename = file.name ? file.name : "";
-      setValue("filename", filename, { shouldDirty: true });
-      await trigger("filename");
+    if (!file) return;
 
-      if (errors.filename) return;
-
-      try {
-        const base64String = await fileToBase64(file);
-        setValue("file", base64String, { shouldDirty: true });
-      } catch (error) {
-        console.error(error);
-        setError("filename", { message: "Could not upload file." });
+    try {
+      const base64String = await fileToBase64(file);
+      if (base64String === "") {
+        setError("filename", { message: "File cannot be empty." });
       }
+
+      setValue("file", base64String, { shouldDirty: true });
+    } catch (error) {
+      console.error(error);
+      setError("filename", { message: "Could not upload file." });
     }
   };
 
@@ -103,7 +109,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
       <DialogContent onCloseAutoFocus={() => reset()} className="max-w-4xl">
         <Form {...form}>
           <form
-            onSubmit={handleSubmit((template) => upsert(template))}
+            onSubmit={handleSubmit((template) => upsertTemplate(template))}
             className="flex flex-col gap-y-4"
           >
             <FormInput
@@ -111,10 +117,9 @@ const UpsertTemplateModal: React.FC<Props> = ({
               name="name"
               label="Template Name"
             />
-            <FileInput
-              handleFile={handleFile}
-              filename={getValues("filename")}
-              error={errors.filename}
+            <FileInput<TemplateSchema>
+              name="filename"
+              handleFileChange={handleFileChange}
             />
             <TemplateVariables />
             <DialogFooter>
