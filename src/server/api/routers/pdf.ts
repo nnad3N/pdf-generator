@@ -37,12 +37,8 @@ export const pdfRouter = createTRPCRouter({
 
       let html = Buffer.from(file).toString("utf-8");
 
-      input.variables.forEach(({ name, value, type }) => {
-        if (type === "date") {
-          html = html.replace(name, value.split("-").reverse().join("/"));
-        } else {
-          html = html.replace(name, value);
-        }
+      input.variables.forEach(({ name, value }) => {
+        html = html.replace(name, value);
       });
 
       await page.setContent(html, { waitUntil: "domcontentloaded" });

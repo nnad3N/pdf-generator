@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "@/components/form/FormInput";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -15,6 +16,8 @@ import {
 import ActionButton from "@/components/ActionButton";
 import Combobox from "@/components/Combobox";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import DateInput from "@/components/form/DateInput";
 
 interface SavePDF {
   filename: string;
@@ -22,16 +25,11 @@ interface SavePDF {
 }
 
 const savePDF = ({ file, filename }: SavePDF) => {
-  const blob = new Blob([Buffer.from(file, "base64")], {
-    type: "application/pdf",
-  });
   const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.href = url;
+  link.href = `data:application/pdf;base64,${file}`;
   link.download = filename;
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
 };
 
 export type PDFTemplate = RouterOutputs["pdf"]["getTemplates"][number];
@@ -53,6 +51,7 @@ const CreatePDF = () => {
         type,
       })),
     },
+    // This prevents from selecting a template that got deleted
     values: templates[0]
       ? {
           templateId: templates[0].id,
@@ -74,7 +73,17 @@ const CreatePDF = () => {
   const variables = watch("variables");
 
   const { mutate: createPDF, isPending } = api.pdf.create.useMutation({
-    onSuccess: savePDF,
+    onSuccess(data) {
+      try {
+        savePDF(data);
+        toast.success("Successfully downloaded the PDF.");
+      } catch (error) {
+        toast.error("Failed to download the PDF.");
+      }
+    },
+    onError() {
+      toast.error("Failed to generate the PDF.");
+    },
   });
 
   return (
@@ -91,32 +100,34 @@ const CreatePDF = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Template</FormLabel>
-                  <Combobox
-                    items={templates.map((template) => ({
-                      value: template.id,
-                      label: template.name,
-                    }))}
-                    selectedItem={field.value}
-                    setSelectedItem={(selectedTemplateId) => {
-                      const newVariables = templates.find(
-                        (template) => template.id === selectedTemplateId,
-                      )?.variables;
+                  <FormControl>
+                    <Combobox
+                      items={templates.map((template) => ({
+                        value: template.id,
+                        label: template.name,
+                      }))}
+                      selectedItem={field.value}
+                      setSelectedItem={(selectedTemplateId) => {
+                        const newVariables = templates.find(
+                          (template) => template.id === selectedTemplateId,
+                        )?.variables;
 
-                      if (newVariables) {
-                        setValue(
-                          "variables",
-                          newVariables.map((variable) => ({
-                            ...variable,
-                            value: "",
-                          })),
-                        );
-                      }
+                        if (newVariables) {
+                          setValue(
+                            "variables",
+                            newVariables.map((variable) => ({
+                              ...variable,
+                              value: "",
+                            })),
+                          );
+                        }
 
-                      field.onChange(selectedTemplateId);
-                    }}
-                    selectText="Select template"
-                    className="w-64"
-                  />
+                        field.onChange(selectedTemplateId);
+                      }}
+                      selectText="Select template"
+                      className="w-64"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -128,21 +139,32 @@ const CreatePDF = () => {
               className="w-64"
             />
           </div>
-          {/* currentTemplate.variables can be undefined if there isn't any templates yet */}
+          {/* variables can be undefined if there isn't any templates yet */}
           {variables && (
             <>
               <Separator className="mb-1.5 mt-2" />
               <div className="grid grid-cols-[auto_auto] justify-between gap-x-4 gap-y-2">
-                {variables.map(({ id, label, type }, index) => (
-                  <FormInput
-                    key={id}
-                    control={form.control}
-                    name={`variables.${index}.value`}
-                    label={label}
-                    type={type}
-                    className="w-64"
-                  />
-                ))}
+                {variables.map(({ id, label, type }, index) =>
+                  type === "date" ? (
+                    <DateInput
+                      key={id}
+                      control={form.control}
+                      name={`variables.${index}.value`}
+                      label={label}
+                      asString
+                      className="w-64"
+                    />
+                  ) : (
+                    <FormInput
+                      key={id}
+                      control={form.control}
+                      name={`variables.${index}.value`}
+                      label={label}
+                      type={type}
+                      className="w-64"
+                    />
+                  ),
+                )}
               </div>
             </>
           )}
