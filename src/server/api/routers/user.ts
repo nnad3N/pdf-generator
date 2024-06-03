@@ -20,7 +20,6 @@ export const userRouter = createTRPCRouter({
         email: true,
         isAdmin: true,
         isDeactivated: true,
-        updatedAt: true,
       },
       orderBy: {
         createdAt: "asc",
