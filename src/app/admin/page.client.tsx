@@ -187,7 +187,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
             onClick={() => setIsConfirmModalOpen(true)}
             variant="destructive"
           >
-            <TrashIcon className="mr-2 h-4 w-4 " />
+            <TrashIcon className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>
