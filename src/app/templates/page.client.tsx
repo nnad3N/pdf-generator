@@ -113,7 +113,10 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
 
   const { mutate: duplicateTemplate } = api.template.duplicate.useMutation({
     async onSuccess() {
-      await utils.template.getAll.invalidate();
+      await Promise.all([
+        utils.template.getAll.invalidate(),
+        utils.pdf.getTemplates.invalidate(),
+      ]);
     },
     onError() {
       toast.error("Failed to duplicate the template.");
@@ -123,7 +126,10 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
   const { mutate: deleteTemplate, isPending } = api.template.delete.useMutation(
     {
       async onSuccess() {
-        await utils.template.getAll.invalidate();
+        await Promise.all([
+          utils.template.getAll.invalidate(),
+          utils.pdf.getTemplates.invalidate(),
+        ]);
       },
       onError() {
         toast.error("Failed to delete the template.");

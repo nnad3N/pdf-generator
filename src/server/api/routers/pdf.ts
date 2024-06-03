@@ -31,9 +31,7 @@ export const pdfRouter = createTRPCRouter({
         },
       });
 
-      const browser = await puppeteer.launch({
-        headless: "new",
-      });
+      const browser = await puppeteer.launch();
 
       const page = await browser.newPage();
 

@@ -4,11 +4,17 @@ import { type RouterOutputs, api } from "@/trpc/react";
 import { useForm } from "react-hook-form";
 import { type PDFSchema, pdfSchema } from "@/lib/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
-import { Combobox } from "@headlessui/react";
-import { ChevronUpDownIcon, CheckIcon } from "@heroicons/react/20/solid";
-import Input from "@/components/form/Input";
-import Button from "@/components/Button";
+import FormInput from "@/components/form/FormInput";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import ActionButton from "@/components/ActionButton";
+import Combobox from "@/components/Combobox";
+import { Separator } from "@/components/ui/separator";
 
 interface SavePDF {
   filename: string;
@@ -33,144 +39,125 @@ export type PDFTemplate = RouterOutputs["pdf"]["getTemplates"][number];
 const CreatePDF = () => {
   const [templates] = api.pdf.getTemplates.useSuspenseQuery();
 
-  const [selectedTemplate, setSelectedTemplate] = useState<PDFTemplate | null>(
-    templates?.[0] ?? null,
-  );
-
-  // updating the templates after invalidation
-  useEffect(() => {
-    setSelectedTemplate(templates?.[0] ?? null);
-  }, [templates]);
-
-  const {
-    register,
-    formState: { errors, isDirty },
-    handleSubmit,
-  } = useForm<PDFSchema>({
+  const form = useForm<PDFSchema>({
     mode: "onSubmit",
     resolver: zodResolver(pdfSchema),
-    values: selectedTemplate
+    defaultValues: {
+      templateId: templates[0]?.id,
+      filename: "",
+      variables: templates[0]?.variables.map(({ id, label, name, type }) => ({
+        id,
+        label,
+        name,
+        value: "",
+        type,
+      })),
+    },
+    values: templates[0]
       ? {
-          templateId: selectedTemplate.id,
+          templateId: templates[0].id,
           filename: "",
-          variables: selectedTemplate.variables.map(({ name, type }) => ({
-            name,
-            value: "",
-            type,
-          })),
+          variables: templates[0].variables.map(
+            ({ id, label, name, type }) => ({
+              id,
+              label,
+              name,
+              value: "",
+              type,
+            }),
+          ),
         }
       : undefined,
   });
 
-  const { mutate: create, isPending } = api.pdf.create.useMutation({
+  const { setValue, watch, handleSubmit } = form;
+  const variables = watch("variables");
+
+  const { mutate: createPDF, isPending } = api.pdf.create.useMutation({
     onSuccess: savePDF,
   });
 
   return (
-    <div className="rounded-box bg-base-200 w-full max-w-xl p-5">
-      <SelectCombobox
-        templates={templates}
-        selectedTemplate={selectedTemplate}
-        setSelectedTemplate={setSelectedTemplate}
-      />
-      <form
-        className="mt-2 flex flex-col gap-y-2"
-        onSubmit={handleSubmit((data) => create(data))}
-      >
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-          {selectedTemplate?.variables.map(({ id, label, type }, index) => (
-            <Input
-              key={id}
-              label={label}
-              {...register(`variables.${index}.value`)}
-              error={errors.variables?.[index]?.value}
-              type={type}
-            />
-          ))}
-        </div>
-        <Input
-          label="Filename"
-          {...register("filename")}
-          error={errors.filename}
-        />
-        <Button
-          className="mt-4"
-          type="submit"
-          disabled={!isDirty}
-          isLoading={isPending}
-          loadingText="Generating"
+    <div className="w-full max-w-xl rounded-lg border px-5 pb-5 pt-1.5 shadow-sm">
+      <Form {...form}>
+        <form
+          className="mt-2 flex flex-col gap-x-4 gap-y-2"
+          onSubmit={handleSubmit((data) => createPDF(data))}
         >
-          Generate PDF
-        </Button>
-      </form>
+          <div className="flex justify-between">
+            <FormField
+              control={form.control}
+              name="templateId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Template</FormLabel>
+                  <Combobox
+                    items={templates.map((template) => ({
+                      value: template.id,
+                      label: template.name,
+                    }))}
+                    selectedItem={field.value}
+                    setSelectedItem={(selectedTemplateId) => {
+                      const newVariables = templates.find(
+                        (template) => template.id === selectedTemplateId,
+                      )?.variables;
+
+                      if (newVariables) {
+                        setValue(
+                          "variables",
+                          newVariables.map((variable) => ({
+                            ...variable,
+                            value: "",
+                          })),
+                        );
+                      }
+
+                      field.onChange(selectedTemplateId);
+                    }}
+                    selectText="Select template"
+                    className="w-64"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormInput
+              control={form.control}
+              name="filename"
+              label="Filename"
+              className="w-64"
+            />
+          </div>
+          {/* currentTemplate.variables can be undefined if there isn't any templates yet */}
+          {variables && (
+            <>
+              <Separator className="mb-1.5 mt-2" />
+              <div className="grid grid-cols-[auto_auto] justify-between gap-x-4 gap-y-2">
+                {variables.map(({ id, label, type }, index) => (
+                  <FormInput
+                    key={id}
+                    control={form.control}
+                    name={`variables.${index}.value`}
+                    label={label}
+                    type={type}
+                    className="w-64"
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          <ActionButton
+            className="mt-4"
+            type="submit"
+            isPending={isPending}
+            pendingText="Generating..."
+          >
+            Generate PDF
+          </ActionButton>
+        </form>
+      </Form>
     </div>
   );
 };
 
 export default CreatePDF;
-
-interface Props {
-  templates: PDFTemplate[];
-  selectedTemplate: PDFTemplate | null;
-  setSelectedTemplate: React.Dispatch<React.SetStateAction<PDFTemplate | null>>;
-}
-
-const SelectCombobox: React.FC<Props> = ({
-  templates,
-  selectedTemplate,
-  setSelectedTemplate,
-}) => {
-  const [query, setQuery] = useState("");
-
-  const filteredTemplates =
-    query === "" || !templates
-      ? templates
-      : templates.filter((template) => {
-          return template.name.toLowerCase().includes(query.toLowerCase());
-        });
-
-  return (
-    <Combobox value={selectedTemplate} onChange={setSelectedTemplate}>
-      <div className="relative">
-        <div className="relative">
-          <Combobox.Input
-            placeholder="Search"
-            className="input input-bordered mr-2 w-full focus:outline-none"
-            displayValue={(template: PDFTemplate | null) =>
-              template?.name ?? ""
-            }
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Combobox.Button
-            type="button"
-            className="btn btn-ghost hover:text-accent-focus focus-visible:text-accent-focus absolute inset-y-0 right-0 text-accent"
-          >
-            <ChevronUpDownIcon className="h-5 w-5" />
-          </Combobox.Button>
-        </div>
-        <Combobox.Options className="bg-base-300 absolute mt-2 max-h-60 w-full overflow-auto rounded-sm shadow-lg">
-          {filteredTemplates?.length === 0 && query !== "" ? (
-            <div className="select-none px-4 py-3 text-center">
-              Nothing found.
-            </div>
-          ) : (
-            filteredTemplates?.map((template) => (
-              <Combobox.Option
-                key={template.id}
-                className="ui-active:bg-primary relative cursor-pointer select-none px-4 py-2 transition-colors duration-100"
-                value={template}
-              >
-                <span className="ui-selected:font-medium block truncate">
-                  {template.name}
-                </span>
-                <span className="ui-selected:flex ui-active:text-base-content absolute inset-y-0 right-0 hidden items-center pr-4 text-accent transition-colors duration-100">
-                  <CheckIcon className="h-5 w-5" />
-                </span>
-              </Combobox.Option>
-            ))
-          )}
-        </Combobox.Options>
-      </div>
-    </Combobox>
-  );
-};

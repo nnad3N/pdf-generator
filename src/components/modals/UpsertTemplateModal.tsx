@@ -69,11 +69,11 @@ const UpsertTemplateModal: React.FC<Props> = ({
   const { mutate: upsertTemplate, isPending } = api.template.upsert.useMutation(
     {
       async onSuccess() {
+        setIsOpen(false);
         await Promise.all([
           utils.template.getAll.invalidate(),
           utils.pdf.getTemplates.invalidate(),
         ]);
-        setIsOpen(false);
       },
       onError(_error, variables) {
         toast.error(
