@@ -50,27 +50,30 @@ const SignIn = () => {
   });
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={handleSubmit((data) => signIn(data))}
-        className="flex flex-col gap-y-2"
-      >
-        <FormInput control={form.control} name="email" label="Email" />
-        <FormInput
-          control={form.control}
-          name="password"
-          label="Password"
-          type="password"
-        />
-        <ActionButton
-          className="mt-2 w-full"
-          isPending={isPending}
-          pendingText="Signing in..."
+    <main className="flex h-screen w-full items-center justify-center">
+      <Form {...form}>
+        <form
+          onSubmit={handleSubmit((data) => signIn(data))}
+          className="flex w-full max-w-xs flex-col gap-y-2"
         >
-          Sign In
-        </ActionButton>
-      </form>
-    </Form>
+          <FormInput control={form.control} name="email" label="Email" />
+          <FormInput
+            control={form.control}
+            name="password"
+            label="Password"
+            type="password"
+          />
+          <ActionButton
+            className="mt-2 w-full"
+            isPending={isPending}
+            pendingText="Signing in..."
+            type="submit"
+          >
+            Sign In
+          </ActionButton>
+        </form>
+      </Form>
+    </main>
   );
 };
 

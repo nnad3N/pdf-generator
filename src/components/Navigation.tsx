@@ -29,6 +29,7 @@ import {
 import { api } from "@/trpc/react";
 import type { WithRequired } from "@/lib/types";
 import clsx from "clsx";
+import { toast } from "sonner";
 
 interface Props {
   user: User;
@@ -66,6 +67,9 @@ const Navigation: React.FC<Props> = ({ user }) => {
   const { mutate: signOut } = api.user.signOut.useMutation({
     onSuccess() {
       window.location.reload();
+    },
+    onError() {
+      toast.error("Failed to sign out.");
     },
   });
 
