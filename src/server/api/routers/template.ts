@@ -100,12 +100,12 @@ export const templateRouter = createTRPCRouter({
               },
             },
           }),
-          ...variablesToUpdate.map(({ id, ...rest }) =>
+          ...variablesToUpdate.map(({ id, ...data }) =>
             ctx.prisma.variable.update({
               where: {
                 id,
               },
-              data: rest,
+              data,
             }),
           ),
         ]);

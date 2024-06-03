@@ -1,3 +1,5 @@
+"use client";
+
 import { Trash2Icon, PlusIcon } from "lucide-react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { type TemplateSchema } from "@/lib/schemas";

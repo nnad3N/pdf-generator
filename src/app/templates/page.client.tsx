@@ -3,7 +3,6 @@
 import ConfirmModal from "@/components/modals/ConfirmModal";
 import UpsertTemplateModal from "@/components/modals/UpsertTemplateModal";
 import { type RouterOutputs, api } from "@/trpc/react";
-import { formatDateAndTime } from "@/lib/date";
 import {
   SettingsIcon,
   FilePlusIcon,
@@ -28,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { format } from "date-fns";
 
 export type Template = RouterOutputs["template"]["getAll"][number];
 
@@ -38,7 +38,7 @@ const Template = () => {
 
   return (
     <>
-      <div className="flex w-full max-w-3xl flex-col items-center rounded-lg border px-5 py-4 shadow-sm">
+      <div className="flex w-full max-w-4xl flex-col items-center rounded-lg border px-5 py-4 shadow-sm">
         <Table>
           <TableHeader>
             <TableRow>
@@ -55,10 +55,10 @@ const Template = () => {
                 <TableCell>{template.name}</TableCell>
                 <TableCell>{template.changedBy.email}</TableCell>
                 <TableCell>
-                  {formatDateAndTime(template.createdAt, "medium")}
+                  {format(template.createdAt, "do 'of' MMM yyyy, HH:mm:ss")}
                 </TableCell>
                 <TableCell>
-                  {formatDateAndTime(template.updatedAt, "medium")}
+                  {format(template.updatedAt, "do 'of' MMM yyyy, HH:mm:ss")}
                 </TableCell>
                 <TableCell className="w-12">
                   <OptionsMenu
