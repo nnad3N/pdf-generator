@@ -44,8 +44,7 @@ const UpsertTemplateModal: React.FC<Props> = ({
   template,
 }) => {
   const form = useForm<TemplateSchema>({
-    mode: "onBlur",
-    reValidateMode: "onBlur",
+    mode: "onSubmit",
     resolver: zodResolver(templateSchema),
     defaultValues,
     values: template

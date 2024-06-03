@@ -167,7 +167,7 @@ const OptionsMenu: React.FC<OptionsMenuProps> = ({
         isPending={isPending}
         pendingText="Deleting..."
         actionHeader="Are you absolutely sure?"
-        actionDescription={`You are about to delete template ${template.name} with file ${template.filename}. This action is permament and cannot be reversed.`}
+        actionDescription={`You are about to delete template "${template.name}" with file "${template.filename}". This action is permament and cannot be reversed.`}
         actionButtonVariant="destructive"
       />
     </>

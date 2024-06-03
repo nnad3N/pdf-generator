@@ -32,7 +32,7 @@ export const templateRouter = createTRPCRouter({
   upsert: protectedProcedure
     .input(templateSchema)
     .mutation(async ({ ctx, input }) => {
-      const template = input.templateId
+      const maybeTemplate = input.templateId
         ? await ctx.prisma.template.findUnique({
             where: {
               id: input.templateId,
@@ -46,9 +46,9 @@ export const templateRouter = createTRPCRouter({
               },
             },
           })
-        : null;
+        : undefined;
 
-      if (!template && input.file) {
+      if (!maybeTemplate && input.file) {
         const file = Buffer.from(input.file, "base64");
 
         await ctx.prisma.template.create({
@@ -65,7 +65,7 @@ export const templateRouter = createTRPCRouter({
         return;
       }
 
-      if (template) {
+      if (maybeTemplate) {
         const filename = input.file ? input.filename : undefined;
         const file = input.file ? Buffer.from(input.file, "base64") : undefined;
 
@@ -80,7 +80,7 @@ export const templateRouter = createTRPCRouter({
           return false;
         });
 
-        const variablesToDelete = template.variables.filter(
+        const variablesToDelete = maybeTemplate.variables.filter(
           ({ id }) => !variablesToUpdate.some((variable) => variable.id === id),
         );
 

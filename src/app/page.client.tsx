@@ -48,7 +48,6 @@ const CreatePDF = () => {
     handleSubmit,
   } = useForm<PDFSchema>({
     mode: "onSubmit",
-    reValidateMode: "onBlur",
     resolver: zodResolver(pdfSchema),
     values: selectedTemplate
       ? {

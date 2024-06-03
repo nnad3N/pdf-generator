@@ -15,7 +15,6 @@ const SignIn = () => {
 
   const form = useForm<SignInSchema>({
     mode: "onSubmit",
-    reValidateMode: "onBlur",
     resolver: zodResolver(signInSchema),
   });
 

@@ -36,7 +36,6 @@ interface Props {
 const UpsertUserModal: React.FC<Props> = ({ isOpen, setIsOpen, user }) => {
   const form = useForm<UserSchema>({
     mode: "onSubmit",
-    reValidateMode: "onBlur",
     resolver: zodResolver(userSchema),
     defaultValues,
     values: user

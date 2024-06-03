@@ -27,7 +27,6 @@ const formSchema = z.object({
 const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onSubmit",
-    reValidateMode: "onBlur",
     resolver: zodResolver(formSchema),
     defaultValues: {
       password: "",
