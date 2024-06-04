@@ -21,6 +21,8 @@ const createContext = cache(() => {
   });
 });
 
+// This will be replaced by hydration helpers from tRPC in the future
+
 export const getServerSideHelpers = async () =>
   createServerSideHelpers({
     router: appRouter,
