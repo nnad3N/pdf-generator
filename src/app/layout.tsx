@@ -9,7 +9,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Authenticated from "@/components/providers/Authenticated";
 
 export const metadata: Metadata = {
-  title: "PDF Generator",
+  title: {
+    default: "Page",
+    template: "%s | PDF Generator",
+  },
+  robots: "noindex",
 };
 
 export default async function RootLayout(props: { children: React.ReactNode }) {

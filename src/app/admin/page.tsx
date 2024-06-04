@@ -4,6 +4,11 @@ import { getServerSideHelpers } from "@/trpc/server";
 import Hydrate from "@/components/providers/Hydrate";
 import { getCachedUser } from "@/server/cache";
 import { redirect } from "next/navigation";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin",
+};
 
 export default async function Page() {
   const user = await getCachedUser();
