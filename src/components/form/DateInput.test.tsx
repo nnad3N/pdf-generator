@@ -50,7 +50,7 @@ const selectDate = async (user: UserEvent) => {
 
   await user.click(dateInput);
 
-  const calendarBtn = screen.getByText("15", {
+  const calendarBtn = await screen.findByText("15", {
     selector: 'button[name="day"]',
   });
 
@@ -58,8 +58,9 @@ const selectDate = async (user: UserEvent) => {
 };
 
 describe("<DateInput />", () => {
+  const user = userEvent.setup();
+
   it("displays the date in the correct format", async () => {
-    const user = userEvent.setup();
     render(<Test />);
 
     const dateInput = screen.getByLabelText<HTMLButtonElement>("Date");
@@ -70,7 +71,6 @@ describe("<DateInput />", () => {
     expect(dateInput.innerHTML).toContain(`15/${format(today, "MM/yyyy")}`);
   });
   it("returns value as date", async () => {
-    const user = userEvent.setup();
     let date: unknown = undefined;
     render(
       <Test
@@ -93,7 +93,6 @@ describe("<DateInput />", () => {
     );
   });
   it("returns value as string", async () => {
-    const user = userEvent.setup();
     let date: unknown = undefined;
     render(
       <Test

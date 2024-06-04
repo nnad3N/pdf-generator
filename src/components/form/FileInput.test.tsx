@@ -45,14 +45,15 @@ const notHtmlFile = new File([`<html>test</html>`], "test_file.txt", {
 });
 
 const getInput = () => {
-  const input = screen.getByText("Choose file").parentElement!;
+  const input = screen.getByText("Choose file").parentElement;
   assert.isDefined(input);
   return input as HTMLInputElement;
 };
 
 describe("<FileInput />", () => {
+  const user = userEvent.setup();
+
   it("displays the filename and updates it on new file upload", async () => {
-    const user = userEvent.setup();
     let filename = "";
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       filename = e.target.files?.[0]?.name ?? "";
@@ -68,7 +69,6 @@ describe("<FileInput />", () => {
     expect(input.innerHTML).toContain(filename.toLocaleLowerCase());
   });
   it("doesn't call handleFileChange if there is an error", async () => {
-    const user = userEvent.setup();
     let filename = "";
 
     const handleFileChange = vi.fn((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +81,7 @@ describe("<FileInput />", () => {
 
     await user.upload(input, notHtmlFile);
 
-    screen.getByText("Only HTML files are supported");
+    await screen.findByText("Only HTML files are supported");
 
     expect(handleFileChange).toBeCalledTimes(0);
     expect(filename).toEqual("");

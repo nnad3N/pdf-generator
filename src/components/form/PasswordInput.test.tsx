@@ -19,20 +19,21 @@ const Test = () => {
 };
 
 describe("<PasswordInput />", () => {
+  const user = userEvent.setup();
+
   it("shows and hides password input", async () => {
-    const user = userEvent.setup();
     render(<Test />);
 
     const input = screen.getByLabelText<HTMLInputElement>("Password");
 
     await user.type(input, "mypassword");
 
-    expect(input.getAttribute("type")).toBe("password");
+    expect(input).toHaveAttribute("type", "password");
 
     const btn = screen.getByRole("button");
     await user.click(btn);
 
-    expect(input.getAttribute("type")).toBe("text");
-    expect(input.value).toBe("mypassword");
+    expect(input).toHaveAttribute("type", "text");
+    expect(input).toHaveValue("mypassword");
   });
 });

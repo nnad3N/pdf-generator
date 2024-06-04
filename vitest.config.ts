@@ -7,8 +7,8 @@ export default defineConfig({
     alias: {
       "@/": new URL("./src/", import.meta.url).pathname,
     },
-    environment: "jsdom",
     globals: true,
+    environment: "jsdom",
     setupFiles: "./tests/setup.ts",
   },
   plugins: [react(), tsconfigPaths()],
