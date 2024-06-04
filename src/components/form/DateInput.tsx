@@ -59,11 +59,7 @@ const DateInput = <
                     baseProps.className,
                   )}
                 >
-                  {field.value ? (
-                    format(field.value, "dd/MM/yyyy")
-                  ) : (
-                    <span>Pick a date</span>
-                  )}
+                  <DisplayDate value={field.value} />
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                 </Button>
               </FormControl>
@@ -93,3 +89,19 @@ const DateInput = <
 };
 
 export default DateInput;
+
+interface DisplayDateProps {
+  value: string | Date | undefined | null;
+}
+
+const DisplayDate: React.FC<DisplayDateProps> = ({ value }) => {
+  if (!value) {
+    return <span>Pick a date</span>;
+  }
+
+  if (typeof value === "string") {
+    return <span>{value}</span>;
+  }
+
+  return <span>{format(value, "dd/MM/yyyy")}</span>;
+};

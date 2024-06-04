@@ -43,31 +43,29 @@ const PasswordInput = <
       render={({ field }) => (
         <FormItem>
           <FormLabel>{baseProps.label}</FormLabel>
-          <FormControl>
-            <div className="relative">
+          <div className="relative">
+            <FormControl>
               <Input
                 {...inputProps}
                 {...field}
                 type={isPasswordVisible ? "text" : "password"}
               />
-              <Button
-                className="absolute right-1 top-1/2 -translate-y-1/2"
-                size="icon-sm"
-                variant="ghost"
-                onClick={() =>
-                  setIsPasswordVisible(
-                    (isPasswordVisible) => !isPasswordVisible,
-                  )
-                }
-              >
-                {isPasswordVisible ? (
-                  <EyeOffIcon className="h-5 w-5" />
-                ) : (
-                  <EyeIcon className="h-5 w-5" />
-                )}
-              </Button>
-            </div>
-          </FormControl>
+            </FormControl>
+            <Button
+              className="absolute right-1 top-1/2 -translate-y-1/2"
+              size="icon-sm"
+              variant="ghost"
+              onClick={() =>
+                setIsPasswordVisible((isPasswordVisible) => !isPasswordVisible)
+              }
+            >
+              {isPasswordVisible ? (
+                <EyeOffIcon className="h-5 w-5" />
+              ) : (
+                <EyeIcon className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
           <FormMessage />
         </FormItem>
       )}
