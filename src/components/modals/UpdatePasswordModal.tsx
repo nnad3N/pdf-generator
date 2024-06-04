@@ -23,7 +23,7 @@ interface Props {
 }
 
 const formSchema = z.object({
-  password: z.string().min(1, "Password is required."),
+  password: z.string().min(1, "Password is required"),
 });
 
 const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
@@ -47,7 +47,7 @@ const PasswordModal: React.FC<Props> = ({ isOpen, setIsOpen, userId }) => {
         setIsOpen(false);
       },
       onError() {
-        toast.error("Failed to update the password.");
+        toast.error("Failed to update the password");
       },
     });
 

@@ -28,12 +28,12 @@ const SignIn = () => {
       switch (error.data?.code) {
         case "NOT_FOUND":
           setError("email", {
-            message: "Email address not found.",
+            message: "Email address not found",
           });
           break;
         case "UNAUTHORIZED":
           setError("password", {
-            message: "Wrong password.",
+            message: "Wrong password",
           });
           break;
         case "FORBIDDEN":

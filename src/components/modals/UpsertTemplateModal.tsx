@@ -93,13 +93,13 @@ const UpsertTemplateModal: React.FC<Props> = ({
     try {
       const base64String = await fileToBase64(file);
       if (base64String === "") {
-        setError("filename", { message: "File cannot be empty." });
+        setError("filename", { message: "File cannot be empty" });
       }
 
       setValue("file", base64String, { shouldDirty: true });
     } catch (error) {
       console.error(error);
-      setError("filename", { message: "Could not upload file." });
+      setError("filename", { message: "Could not upload file" });
     }
   };
 

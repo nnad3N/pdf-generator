@@ -35,7 +35,7 @@ export const templateSchema = z.object({
   name: z.string().min(1, { message: "Template name is required" }),
   filename: z
     .string()
-    .min(1, { message: "Template file is required." })
+    .min(1, { message: "Template file is required" })
     .endsWith(".html", { message: "Only HTML files are supported" }),
   file: z.string().optional(),
   variables: z.array(
