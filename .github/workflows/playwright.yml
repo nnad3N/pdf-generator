@@ -24,7 +24,7 @@ jobs:
         run: pnpm playwright install --with-deps
 
       - name: Seed The Database
-        run: pnpm prisma db seed
+        run: pnpm db:push && pnpm prisma db seed
 
       - name: Run Playwright Tests
         run: pnpm playwright test

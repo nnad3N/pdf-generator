@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: Vitest Tests
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
         uses: ./.github/setup
 
       - name: Seed The Database
-        run: pnpm prisma db seed
+        run: pnpm db:push && pnpm prisma db seed
 
       - name: Run Vitest Tests
         run: pnpm vitest --run
