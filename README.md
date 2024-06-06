@@ -1,6 +1,6 @@
 # PDF Generator
 
-This is an example app in created using Next.js that allows you to generate dynamic PDF files from a HTML template.
+This is an example app created using Next.js, that allows you to generate dynamic PDF files from a HTML template.
 
 ## The Stack
 
@@ -9,20 +9,20 @@ This is an example app in created using Next.js that allows you to generate dyna
 - [Prisma](https://prisma.io)
 - [Tailwind CSS](https://tailwindcss.com)
 - [tRPC](https://trpc.io)
+- [shadcn/ui](https://ui.shadcn.com/)
 
 ## Tests
 
-- Unit: [Vitest](https://vitest.dev/)
-- Component and E2E: [Cypress](https://www.cypress.io/)
+- Unit and Components: [Vitest](https://vitest.dev/)
+- E2E: [Playwright](https://playwright.dev/)
 
 The tests included in this repo are only for demonstration and should be extended/changed for production use.
 
 ## Misc
 
 - You need to have [pnpm](https://pnpm.io/) installed on your system
-- This repo uses local SQLite database
-- You can login with `root@root.com` and `root` after seeding the database
-- I know that the auth should use CSRF token for the added security
+- This repo uses local SQLite database, but you can use [Turso](https://turso.tech/) for production
+- You can sign in with `root@root.com` and `root` after seeding the database
 
 ## Getting started
 
