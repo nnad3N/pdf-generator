@@ -1,16 +1,18 @@
+import { testUsers } from "@/lib/constants";
 import { prisma } from "@/server/db";
 import bcrypt from "bcrypt";
 
 async function main() {
-  const hashedRootPassword = await bcrypt.hash("root", 10);
+  const rootUser = testUsers["admin"];
+  const hashedRootPassword = await bcrypt.hash(rootUser.password, 10);
 
   await prisma.user.upsert({
     where: {
-      email: "root@root.com",
+      email: rootUser.email,
     },
     update: {},
     create: {
-      email: "root@root.com",
+      email: rootUser.email,
       password: hashedRootPassword,
       firstName: "Root",
       lastName: "User",
@@ -19,15 +21,16 @@ async function main() {
     },
   });
 
-  const hashedUserPassword = await bcrypt.hash("user", 10);
+  const normalUser = testUsers["user"];
+  const hashedUserPassword = await bcrypt.hash(normalUser.password, 10);
 
   await prisma.user.upsert({
     where: {
-      email: "user@user.com",
+      email: normalUser.email,
     },
     update: {},
     create: {
-      email: "user@user.com",
+      email: normalUser.email,
       password: hashedUserPassword,
       firstName: "Normal",
       lastName: "User",
@@ -36,15 +39,19 @@ async function main() {
     },
   });
 
-  const hashedDeactivatedPassword = await bcrypt.hash("deactivated", 10);
+  const deactivatedUser = testUsers["deactivated"];
+  const hashedDeactivatedPassword = await bcrypt.hash(
+    deactivatedUser.password,
+    10,
+  );
 
   await prisma.user.upsert({
     where: {
-      email: "deactivated@deactivated.com",
+      email: deactivatedUser.email,
     },
     update: {},
     create: {
-      email: "deactivated@deactivated.com",
+      email: deactivatedUser.email,
       password: hashedDeactivatedPassword,
       firstName: "Deactivated",
       lastName: "User",

@@ -78,7 +78,13 @@ const Navigation: React.FC<Props> = ({ user }) => {
       <div>
         {links.map(({ isProtected, href, tooltip, IconElement }) =>
           isProtected && !user.isAdmin ? null : (
-            <NavButton key={href} as="link" tooltip={tooltip} href={href}>
+            <NavButton
+              data-testid={`nav-${tooltip.replaceAll(" ", "-").toLocaleLowerCase()}-link`}
+              key={href}
+              as="link"
+              tooltip={tooltip}
+              href={href}
+            >
               {<IconElement className="h-5 w-5" />}
             </NavButton>
           ),
@@ -86,7 +92,12 @@ const Navigation: React.FC<Props> = ({ user }) => {
       </div>
       <div>
         <ThemeToggle />
-        <NavButton as="button" tooltip="Sign Out" onClick={() => signOut()}>
+        <NavButton
+          data-testid="sign-out-button"
+          as="button"
+          tooltip="Sign Out"
+          onClick={() => signOut()}
+        >
           <SignOutIcon className="h-5 w-5" />
         </NavButton>
       </div>
@@ -99,6 +110,7 @@ export default Navigation;
 interface BaseNavButtonProps<T extends "link" | "button" | "base"> {
   as: T;
   tooltip: string;
+  "data-testid"?: string;
 }
 
 type LinkNavButtonProps = WithRequired<

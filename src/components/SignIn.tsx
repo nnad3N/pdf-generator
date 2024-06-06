@@ -16,6 +16,10 @@ const SignIn = () => {
   const form = useForm<SignInSchema>({
     mode: "onSubmit",
     resolver: zodResolver(signInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const { handleSubmit, setError } = form;
