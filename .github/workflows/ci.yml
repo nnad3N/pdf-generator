@@ -48,8 +48,14 @@ jobs:
       - name: Install dependencies (with cache)
         run: pnpm install
 
-      - name: Build, lint and type-check
-        run: pnpm build && pnpm lint && pnpm format && pnpm typecheck
+      - name: lint
+        run: pnpm lint
+
+      - name: format
+        run: pnpm format
+
+      - name: type-check
+        run: pnpm typecheck
 
       - name: Setup next build cache
         uses: actions/cache@v3
@@ -57,9 +63,9 @@ jobs:
           path: |
             ~/.pnpm
             ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.cjs', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
 
       - name: Run unit tests
-        run: pnpm test:unit
+        run: pnpm vitest --run
