@@ -8,7 +8,7 @@
     "resolveJsonModule": true,
     "moduleDetection": "force",
     "isolatedModules": true,
-    "types": ["cypress", "node"],
+    "types": ["node"],
 
     /* Strictness */
     "strict": true,
@@ -31,7 +31,7 @@
     }
   },
   "include": [
-    ".eslintrc.js",
+    ".eslintrc.cjs",
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
@@ -39,7 +39,8 @@
     "**/*.mjs",
     ".next/types/**/*.ts",
     "src/env.js",
-    "next.config.js"
+    "next.config.js",
+    "prettier.config.js"
   ],
 
   "exclude": ["node_modules"]

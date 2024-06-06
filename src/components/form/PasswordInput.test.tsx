@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import PasswordInput from "@/components/form/PasswordInput";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";

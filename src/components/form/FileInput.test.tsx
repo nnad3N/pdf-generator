@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { expect, vi } from "vitest";
+import { assert, describe, expect, it, vi } from "vitest";
 import FileInput from "@/components/form/FileInput";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
