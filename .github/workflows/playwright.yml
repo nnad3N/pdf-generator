@@ -21,6 +21,9 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps
 
+      - name: Regenerate Prisma Client
+        run: pnpm prisma generate
+
       - name: Run Playwright tests
         run: pnpm playwright test
 
