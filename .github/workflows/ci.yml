@@ -8,64 +8,46 @@ on:
   merge_group:
 
 env:
-  NODE_ENV: "test"
   DATABASE_URL: "file:./db.sqlite"
-  SESSION_COOKIE_NAME: "auth-session"
 
 jobs:
-  build-lint-test:
-    runs-on: ubuntu-22.04
-    strategy:
-      matrix:
-        node-version: [18]
-
+  lint:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Setup Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "pnpm_cache_dir=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v3
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies (with cache)
-        run: pnpm install
-
-      - name: lint
+      - name: Lint
         run: pnpm lint
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: format
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Format
         run: pnpm format
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: type-check
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Typecheck
         run: pnpm typecheck
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Setup next build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pnpm
-            ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.cjs', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: Run unit tests
+      - name: Typecheck
         run: pnpm vitest --run
