@@ -23,10 +23,10 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps
 
-      - name: Seed Database
+      - name: Seed The Database
         run: pnpm prisma db seed
 
-      - name: Run Playwright tests
+      - name: Run Playwright Tests
         run: pnpm playwright test
 
       - uses: actions/upload-artifact@v4

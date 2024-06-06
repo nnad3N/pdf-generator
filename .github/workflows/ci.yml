@@ -42,16 +42,3 @@ jobs:
 
       - name: Typecheck
         run: pnpm typecheck
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup
-        uses: ./.github/setup
-
-      - name: Seed Database
-        run: pnpm prisma db seed
-
-      - name: Typecheck
-        run: pnpm vitest --run

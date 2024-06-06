@@ -11,4 +11,4 @@ runs:
         cache: "pnpm"
 
     - shell: bash
-      run: pnpm install
+      run: pnpm install && pnpm prisma generate
