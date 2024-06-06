@@ -1,9 +1,15 @@
 name: Playwright Tests
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+env:
+  DATABASE_URL: "file:./db.sqlite"
+  CI: true
+
 jobs:
   test:
     timeout-minutes: 5
@@ -14,15 +20,11 @@ jobs:
       - name: Setup
         uses: ./.github/setup
 
-      - name: Copy env
-        shell: bash
-        run: cp .env.example .env
-
       - name: Install Playwright Browsers
         run: pnpm playwright install --with-deps
 
-      - name: Regenerate Prisma Client
-        run: pnpm prisma generate
+      - name: Seed Database
+        run: pnpm prisma db seed
 
       - name: Run Playwright tests
         run: pnpm playwright test
