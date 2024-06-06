@@ -2,7 +2,7 @@
   "name": "pdf-generator",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@9.1.2",
+  "packageManager": "pnpm@9.2.0",
   "type": "module",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -13,10 +13,10 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check \"**/*.{js,cjs,mjs,ts,tsx,md,json}\"",
+    "format:fix": "prettier \"**/*.{js,cjs,mjs,ts,tsx,md,json}\" --write",
     "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "test:cypress": "pnpm dlx cypress open",
     "test": "vitest",
     "test:e2e": "pnpm playwright test --ui"
   },
@@ -78,7 +78,6 @@
     "@typescript-eslint/parser": "^7.11.0",
     "@vitejs/plugin-react": "^4.3.0",
     "autoprefixer": "^10.4.19",
-    "cypress": "^13.10.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.3",
     "jsdom": "^24.1.0",
