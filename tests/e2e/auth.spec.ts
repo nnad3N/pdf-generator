@@ -1,12 +1,12 @@
-import { TestUserType, testUsers } from "@/lib/constants";
-import { test, expect, Page } from "@playwright/test";
+import { type TestUserType, testUsers } from "@/lib/constants";
+import { test, expect, type Page } from "@playwright/test";
 
 test("sign in with root user", async ({ page }) => {
   await page.goto("/admin");
   await signInAs("admin", page);
 
   await expect(page.getByRole("navigation")).toBeVisible();
-  expect(page).toHaveURL(/.*admin/);
+  await expect(page).toHaveURL(/.*admin/);
 });
 
 test("prevents deactivated user from signing in", async ({ page }) => {
@@ -25,7 +25,7 @@ test("sign out works", async ({ page }) => {
 
   await assertSignInScreen(page);
 
-  expect(page).toHaveURL(/.*templates/);
+  await expect(page).toHaveURL(/.*templates/);
 });
 
 test("after sign out, user can't view cached pages by history.back()", async ({
@@ -42,7 +42,7 @@ test("after sign out, user can't view cached pages by history.back()", async ({
 
   await assertSignInScreen(page);
 
-  expect(page).toHaveURL(/.*templates/);
+  await expect(page).toHaveURL(/.*templates/);
 });
 
 const signInAs = async (userType: TestUserType, page: Page) => {

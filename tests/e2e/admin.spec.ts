@@ -1,6 +1,6 @@
-import { TestUserType, testUsers } from "@/lib/constants";
+import { type TestUserType, testUsers } from "@/lib/constants";
 import { test, expect } from "../fixtures/admin";
-import { Page } from "@playwright/test";
+import { type Page } from "@playwright/test";
 
 test("you cannot deactivate your own account", async ({ page }) => {
   await openSettingsMenu("admin", page);
